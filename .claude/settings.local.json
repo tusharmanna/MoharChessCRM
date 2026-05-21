@@ -15,7 +15,8 @@
       "Bash(\"Frontend is *)",
       "PowerShell(git *)",
       "WebFetch(domain:mohar-chess-crm.vercel.app)",
-      "WebFetch(domain:moharchesscrm.onrender.com)"
+      "WebFetch(domain:moharchesscrm.onrender.com)",
+      "Bash(git add *)"
     ]
   }
 }
