@@ -210,6 +210,193 @@ initDatabase().then(() => {
     }
   });
 
+  // ===== CRM FEATURES =====
+
+  // Pipeline Stages - Track prospect journey
+  app.post('/api/pipeline/:studentId', (req, res) => {
+    try {
+      const { studentId } = req.params;
+      const { stage, expected_enrollment_date, loss_reason } = req.body;
+
+      run(
+        `INSERT INTO pipeline_stages (student_id, stage, expected_enrollment_date, loss_reason)
+         VALUES (?, ?, ?, ?)`,
+        [studentId, stage, expected_enrollment_date, loss_reason]
+      );
+
+      res.json({ message: 'Pipeline stage updated' });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.get('/api/pipeline/:studentId', (req, res) => {
+    try {
+      const { studentId } = req.params;
+      const pipeline = queryOne(
+        `SELECT * FROM pipeline_stages WHERE student_id = ? ORDER BY stage_updated_at DESC LIMIT 1`,
+        [studentId]
+      );
+      res.json(pipeline || {});
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // Lead Scoring
+  app.post('/api/lead-score/:studentId', (req, res) => {
+    try {
+      const { studentId } = req.params;
+      const { interest_level, engagement_score, chess_experience_score, demographic_fit } = req.body;
+
+      const total_score = interest_level + engagement_score + chess_experience_score + demographic_fit;
+      let priority = 'low';
+      if (total_score >= 7) priority = 'hot';
+      else if (total_score >= 4) priority = 'medium';
+
+      run(
+        `INSERT OR REPLACE INTO lead_scores
+         (student_id, interest_level, engagement_score, chess_experience_score, demographic_fit, total_score, priority)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [studentId, interest_level, engagement_score, chess_experience_score, demographic_fit, total_score, priority]
+      );
+
+      res.json({ score: total_score, priority });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.get('/api/lead-score/:studentId', (req, res) => {
+    try {
+      const { studentId } = req.params;
+      const score = queryOne(`SELECT * FROM lead_scores WHERE student_id = ?`, [studentId]);
+      res.json(score || { total_score: 0, priority: 'low' });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // Student Progress
+  app.post('/api/progress/:studentId', (req, res) => {
+    try {
+      const { studentId } = req.params;
+      const {
+        attendance_rate,
+        skill_level,
+        internal_rating,
+        parent_satisfaction,
+        months_enrolled,
+        strengths,
+        areas_to_improve
+      } = req.body;
+
+      run(
+        `INSERT OR REPLACE INTO progress
+         (student_id, attendance_rate, skill_level, internal_rating, parent_satisfaction, months_enrolled, strengths, areas_to_improve)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          studentId,
+          attendance_rate,
+          skill_level,
+          internal_rating,
+          parent_satisfaction,
+          months_enrolled,
+          strengths,
+          areas_to_improve
+        ]
+      );
+
+      res.json({ message: 'Progress updated' });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.get('/api/progress/:studentId', (req, res) => {
+    try {
+      const { studentId } = req.params;
+      const progress = queryOne(`SELECT * FROM progress WHERE student_id = ?`, [studentId]);
+      res.json(progress || {});
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // Parent Preferences
+  app.put('/api/parents/:parentId/preferences', (req, res) => {
+    try {
+      const { parentId } = req.params;
+      const { communication_preference, best_contact_time, communication_frequency } = req.body;
+
+      run(
+        `UPDATE parents
+         SET communication_preference=?, best_contact_time=?, communication_frequency=?
+         WHERE id=?`,
+        [communication_preference, best_contact_time, communication_frequency, parentId]
+      );
+
+      res.json({ message: 'Parent preferences updated' });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // Hot Leads - Get prospects needing attention
+  app.get('/api/hot-leads', (req, res) => {
+    try {
+      const hotLeads = query(
+        `SELECT s.*, ls.total_score, ls.priority
+         FROM students s
+         LEFT JOIN lead_scores ls ON s.id = ls.student_id
+         WHERE s.status = 'prospect' AND (ls.priority = 'hot' OR ls.total_score >= 7)
+         ORDER BY ls.total_score DESC`
+      );
+      res.json(hotLeads);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // At-Risk Students
+  app.get('/api/at-risk-students', (req, res) => {
+    try {
+      const atRisk = query(
+        `SELECT s.*, p.attendance_rate, p.parent_satisfaction
+         FROM students s
+         LEFT JOIN progress p ON s.id = p.student_id
+         WHERE s.status = 'enrolled' AND (p.attendance_rate < 0.75 OR p.parent_satisfaction < 3 OR s.risk_score = 'high')
+         ORDER BY s.updated_at DESC`
+      );
+      res.json(atRisk);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // CRM Dashboard Stats
+  app.get('/api/crm-dashboard', (req, res) => {
+    try {
+      const totalLeads = queryOne(`SELECT COUNT(*) as count FROM students WHERE status = 'prospect'`);
+      const enrolled = queryOne(`SELECT COUNT(*) as count FROM students WHERE status = 'enrolled'`);
+      const hotLeads = queryOne(`SELECT COUNT(*) as count FROM lead_scores WHERE priority = 'hot'`);
+      const atRisk = queryOne(`SELECT COUNT(*) as count FROM progress WHERE attendance_rate < 0.75`);
+      const avgConversion = queryOne(
+        `SELECT ROUND(COUNT(CASE WHEN status = 'enrolled' THEN 1 END) * 100.0 / COUNT(*), 2) as rate FROM students`
+      );
+
+      res.json({
+        totalLeads: totalLeads?.count || 0,
+        enrolled: enrolled?.count || 0,
+        hotLeads: hotLeads?.count || 0,
+        atRiskStudents: atRisk?.count || 0,
+        conversionRate: avgConversion?.rate || 0
+      });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
   const PORT = process.env.PORT || 5000;
   app.listen(PORT, () => {
     console.log(`✓ Server running on http://localhost:${PORT}`);

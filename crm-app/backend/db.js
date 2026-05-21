@@ -31,6 +31,13 @@ async function initDatabase() {
     batch TEXT,
     status TEXT DEFAULT 'prospect',
     notes TEXT,
+    source_of_lead TEXT,
+    enrollment_date DATE,
+    last_activity_date DATE,
+    student_rating INTEGER,
+    chess_rating REAL,
+    payment_status TEXT DEFAULT 'pending',
+    risk_score TEXT DEFAULT 'low',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`);
@@ -40,7 +47,11 @@ async function initDatabase() {
     student_id INTEGER NOT NULL,
     parent_name TEXT NOT NULL,
     phone_number TEXT,
+    email TEXT,
     relation TEXT DEFAULT 'parent',
+    communication_preference TEXT DEFAULT 'email',
+    best_contact_time TEXT DEFAULT 'evening',
+    communication_frequency TEXT DEFAULT 'monthly',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
   )`);
@@ -62,7 +73,51 @@ async function initDatabase() {
     description TEXT,
     due_date DATE,
     status TEXT DEFAULT 'pending',
+    priority TEXT DEFAULT 'medium',
+    assigned_to TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
+  )`);
+
+  // Pipeline stages table (for prospect tracking)
+  db.run(`CREATE TABLE IF NOT EXISTS pipeline_stages (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    student_id INTEGER NOT NULL,
+    stage TEXT NOT NULL,
+    days_in_stage INTEGER DEFAULT 0,
+    expected_enrollment_date DATE,
+    loss_reason TEXT,
+    stage_entered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    stage_updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
+  )`);
+
+  // Progress tracking table
+  db.run(`CREATE TABLE IF NOT EXISTS progress (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    student_id INTEGER NOT NULL,
+    attendance_rate REAL,
+    skill_level TEXT,
+    internal_rating REAL,
+    parent_satisfaction INTEGER,
+    months_enrolled INTEGER,
+    strengths TEXT,
+    areas_to_improve TEXT,
+    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
+  )`);
+
+  // Lead scoring table
+  db.run(`CREATE TABLE IF NOT EXISTS lead_scores (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    student_id INTEGER NOT NULL,
+    interest_level INTEGER DEFAULT 0,
+    engagement_score INTEGER DEFAULT 0,
+    chess_experience_score INTEGER DEFAULT 0,
+    demographic_fit INTEGER DEFAULT 0,
+    total_score INTEGER DEFAULT 0,
+    priority TEXT DEFAULT 'low',
+    last_calculated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
   )`);
 
