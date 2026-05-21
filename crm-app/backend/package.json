@@ -5,7 +5,8 @@
   "scripts": {
     "start": "node server.js",
     "import": "node importData.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "postinstall": "npm rebuild sqlite3"
   },
   "keywords": [],
   "author": "",
