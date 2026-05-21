@@ -1,0 +1,523 @@
+
+<h2 class="sr-only">Mohar Chess Academy CRM — mini school ERP with student management, fees, attendance, and performance analytics</h2>
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+.mca-orange { color: #E8751A; }
+.badge { display:inline-block; font-size:11px; padding:2px 8px; border-radius:20px; font-weight:500; }
+.badge-active { background:#E1F5EE; color:#085041; }
+.badge-inactive { background:#FAECE7; color:#712B13; }
+.badge-online { background:#EEEDFE; color:#3C3489; }
+.badge-inperson { background:#E1F5EE; color:#085041; }
+.badge-both { background:#FAEEDA; color:#633806; }
+.badge-paid { background:#E1F5EE; color:#085041; }
+.badge-unpaid { background:#FAECE7; color:#712B13; }
+.badge-partial { background:#FAEEDA; color:#633806; }
+.badge-beg { background:#FAEEDA; color:#633806; }
+.badge-int { background:#EEEDFE; color:#3C3489; }
+.badge-adv { background:#1A1A1A; color:#E8751A; }
+.nav-btn { background:transparent; border:0.5px solid var(--color-border-secondary); border-radius:var(--border-radius-md); padding:6px 14px; font-size:13px; cursor:pointer; color:var(--color-text-secondary); }
+.nav-btn.active { background:#E8751A; color:#fff; border-color:#E8751A; }
+.panel { display:none; }
+.panel.active { display:block; }
+.card { background:var(--color-background-primary); border:0.5px solid var(--color-border-tertiary); border-radius:var(--border-radius-lg); padding:1rem 1.25rem; }
+.metric { background:var(--color-background-secondary); border-radius:var(--border-radius-md); padding:1rem; }
+.metric-label { font-size:12px; color:var(--color-text-secondary); margin-bottom:4px; }
+.metric-value { font-size:22px; font-weight:500; color:var(--color-text-primary); }
+.metric-sub { font-size:11px; color:var(--color-text-secondary); margin-top:2px; }
+.section-title { font-size:13px; font-weight:500; color:var(--color-text-secondary); text-transform:uppercase; letter-spacing:.05em; margin-bottom:10px; }
+.student-row { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:0.5px solid var(--color-border-tertiary); }
+.student-row:last-child { border-bottom:none; }
+.avatar { width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:500; flex-shrink:0; }
+.progress-bar { height:6px; border-radius:3px; background:var(--color-background-secondary); overflow:hidden; }
+.progress-fill { height:100%; border-radius:3px; background:#E8751A; }
+.att-cell { width:28px; height:28px; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:500; flex-shrink:0; cursor:pointer; }
+.att-P { background:#E1F5EE; color:#085041; }
+.att-A { background:#FAECE7; color:#712B13; }
+.att-L { background:#FAEEDA; color:#633806; }
+.att-NA { background:var(--color-background-secondary); color:var(--color-text-secondary); }
+input[type=text], input[type=email], input[type=number], select, textarea { width:100%; border:0.5px solid var(--color-border-secondary); border-radius:var(--border-radius-md); padding:8px 10px; font-size:13px; background:var(--color-background-primary); color:var(--color-text-primary); }
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px; }
+.form-label { font-size:12px; color:var(--color-text-secondary); margin-bottom:4px; }
+.btn-primary { background:#E8751A; color:#fff; border:none; border-radius:var(--border-radius-md); padding:8px 18px; font-size:13px; cursor:pointer; font-weight:500; }
+.btn-primary:hover { background:#D06618; }
+.btn-ghost { background:transparent; border:0.5px solid var(--color-border-secondary); border-radius:var(--border-radius-md); padding:6px 12px; font-size:12px; cursor:pointer; color:var(--color-text-secondary); }
+.fee-row { display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:0.5px solid var(--color-border-tertiary); font-size:13px; }
+.fee-row:last-child { border-bottom:none; }
+.alert { border-radius:var(--border-radius-md); padding:10px 14px; font-size:13px; margin-bottom:8px; display:flex; align-items:center; gap:10px; }
+.alert-red { background:#FAECE7; color:#712B13; border-left:3px solid #993C1D; }
+.alert-amber { background:#FAEEDA; color:#633806; border-left:3px solid #854F0B; }
+</style>
+
+<div style="padding-top:0.5rem">
+
+<div style="background:#1A1A1A; border-radius:var(--border-radius-lg); padding:14px 20px; margin-bottom:14px; display:flex; align-items:center; justify-content:space-between;">
+  <div style="display:flex; align-items:center; gap:12px;">
+    <div style="width:40px; height:40px; border-radius:50%; background:#E8751A; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;">♟</div>
+    <div>
+      <div style="font-size:16px; font-weight:500; color:#E8751A;">Mohar Chess Academy</div>
+      <div style="font-size:11px; color:#A0896E;">Mini school ERP · CRM dashboard</div>
+    </div>
+  </div>
+  <div style="text-align:right;">
+    <div style="font-size:11px; color:#A0896E;">Academic year</div>
+    <div style="font-size:13px; font-weight:500; color:#E8751A;">2024–2025</div>
+  </div>
+</div>
+
+<div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px;">
+  <button class="nav-btn active" onclick="showPanel('dashboard',this)">Dashboard</button>
+  <button class="nav-btn" onclick="showPanel('students',this)">Students</button>
+  <button class="nav-btn" onclick="showPanel('onboarding',this)">Onboarding</button>
+  <button class="nav-btn" onclick="showPanel('fees',this)">Fee intelligence</button>
+  <button class="nav-btn" onclick="showPanel('attendance',this)">Attendance</button>
+  <button class="nav-btn" onclick="showPanel('performance',this)">Performance</button>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard" class="panel active">
+  <div style="display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin-bottom:14px;">
+    <div class="metric">
+      <div class="metric-label">Total students</div>
+      <div class="metric-value mca-orange">100</div>
+      <div class="metric-sub">+8 this term</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Monthly revenue</div>
+      <div class="metric-value" style="color:var(--color-text-success);">$7,500</div>
+      <div class="metric-sub">$90,000/year projected</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Outstanding fees</div>
+      <div class="metric-value" style="color:#993C1D;">$1,350</div>
+      <div class="metric-sub">12 students overdue</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Avg attendance</div>
+      <div class="metric-value">87%</div>
+      <div class="metric-sub">This month</div>
+    </div>
+  </div>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;">
+    <div class="card">
+      <div class="section-title">Session breakdown</div>
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <div>
+          <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px;"><span>In-person</span><span style="font-weight:500;">45 students</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:45%; background:#0F6E56;"></div></div>
+        </div>
+        <div>
+          <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px;"><span>Online (Zoom)</span><span style="font-weight:500;">30 students</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:30%; background:#534AB7;"></div></div>
+        </div>
+        <div>
+          <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px;"><span>Both</span><span style="font-weight:500;">25 students</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:25%;"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="section-title">Level breakdown</div>
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <div>
+          <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px;"><span>Beginner</span><span style="font-weight:500;">42 students</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:42%; background:#854F0B;"></div></div>
+        </div>
+        <div>
+          <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px;"><span>Intermediate</span><span style="font-weight:500;">38 students</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:38%; background:#534AB7;"></div></div>
+        </div>
+        <div>
+          <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px;"><span>Advanced</span><span style="font-weight:500;">20 students</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:20%; background:#1A1A1A;"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">Fee alerts</div>
+    <div class="alert alert-red">⚠ Noah Johnson — 2 months unpaid ($150). Last contact: 3 weeks ago.</div>
+    <div class="alert alert-red">⚠ Emma Williams — 4 months unpaid ($300). On hiatus, follow up required.</div>
+    <div class="alert alert-amber">◆ Liam Chen — partial payment Nov. Balance $25 outstanding.</div>
+    <div class="alert alert-amber">◆ Priya Sharma — April invoice sent. Payment not yet received.</div>
+    <div style="margin-top:8px;">
+      <button class="btn-ghost" onclick="sendPrompt('Draft a polite payment reminder message for overdue Mohar Chess Academy fees')">Draft payment reminder ↗</button>
+    </div>
+  </div>
+</div>
+
+<!-- STUDENTS -->
+<div id="students" class="panel">
+  <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+    <input type="text" placeholder="Search students..." style="max-width:260px;" oninput="filterStudents(this.value)"/>
+    <select style="max-width:140px;" onchange="filterStudents()">
+      <option>All levels</option>
+      <option>Beginner</option>
+      <option>Intermediate</option>
+      <option>Advanced</option>
+    </select>
+    <select style="max-width:140px;" onchange="filterStudents()">
+      <option>All sessions</option>
+      <option>In-Person</option>
+      <option>Online</option>
+      <option>Both</option>
+    </select>
+    <button class="btn-primary" onclick="showPanel('onboarding', document.querySelectorAll('.nav-btn')[2])">+ Add student</button>
+  </div>
+
+  <div class="card" id="studentList">
+    <div class="student-row">
+      <div class="avatar" style="background:#FAEEDA; color:#633806;">AP</div>
+      <div style="flex:1; min-width:0;">
+        <div style="font-size:13px; font-weight:500;">Aiden Parker</div>
+        <div style="font-size:11px; color:var(--color-text-secondary);">MCA-001 · Sarah Parker · (404) 555-0191</div>
+      </div>
+      <span class="badge badge-beg">Beginner</span>
+      <span class="badge badge-inperson">In-person</span>
+      <span class="badge badge-paid">Paid</span>
+      <span class="badge badge-active">Active</span>
+    </div>
+    <div class="student-row">
+      <div class="avatar" style="background:#EEEDFE; color:#3C3489;">PS</div>
+      <div style="flex:1; min-width:0;">
+        <div style="font-size:13px; font-weight:500;">Priya Sharma</div>
+        <div style="font-size:11px; color:var(--color-text-secondary);">MCA-002 · Raj Sharma · (404) 555-0234</div>
+      </div>
+      <span class="badge badge-int">Intermediate</span>
+      <span class="badge badge-both">Both</span>
+      <span class="badge badge-unpaid">Unpaid</span>
+      <span class="badge badge-active">Active</span>
+    </div>
+    <div class="student-row">
+      <div class="avatar" style="background:#E1F5EE; color:#085041;">LC</div>
+      <div style="flex:1; min-width:0;">
+        <div style="font-size:13px; font-weight:500;">Liam Chen</div>
+        <div style="font-size:11px; color:var(--color-text-secondary);">MCA-003 · Wei Chen · (404) 555-0178</div>
+      </div>
+      <span class="badge badge-beg">Beginner</span>
+      <span class="badge badge-inperson">In-person</span>
+      <span class="badge badge-partial">Partial</span>
+      <span class="badge badge-active">Active</span>
+    </div>
+    <div class="student-row">
+      <div class="avatar" style="background:#1A1A1A; color:#E8751A;">SM</div>
+      <div style="flex:1; min-width:0;">
+        <div style="font-size:13px; font-weight:500;">Sofia Martinez</div>
+        <div style="font-size:11px; color:var(--color-text-secondary);">MCA-004 · Carlos Martinez · (404) 555-0312</div>
+      </div>
+      <span class="badge badge-adv">Advanced</span>
+      <span class="badge badge-both">Both</span>
+      <span class="badge badge-paid">Paid</span>
+      <span class="badge badge-active">Active</span>
+    </div>
+    <div class="student-row">
+      <div class="avatar" style="background:#EEEDFE; color:#3C3489;">NJ</div>
+      <div style="flex:1; min-width:0;">
+        <div style="font-size:13px; font-weight:500;">Noah Johnson</div>
+        <div style="font-size:11px; color:var(--color-text-secondary);">MCA-005 · Linda Johnson · (404) 555-0445</div>
+      </div>
+      <span class="badge badge-int">Intermediate</span>
+      <span class="badge badge-online">Online</span>
+      <span class="badge badge-unpaid">Unpaid</span>
+      <span class="badge badge-active">Active</span>
+    </div>
+    <div class="student-row">
+      <div class="avatar" style="background:#FAECE7; color:#712B13;">EW</div>
+      <div style="flex:1; min-width:0;">
+        <div style="font-size:13px; font-weight:500;">Emma Williams</div>
+        <div style="font-size:11px; color:var(--color-text-secondary);">MCA-006 · Tom Williams · (404) 555-0567</div>
+      </div>
+      <span class="badge badge-beg">Beginner</span>
+      <span class="badge badge-inperson">In-person</span>
+      <span class="badge badge-unpaid">Unpaid</span>
+      <span class="badge badge-inactive">Inactive</span>
+    </div>
+    <div class="student-row">
+      <div class="avatar" style="background:#1A1A1A; color:#E8751A;">JL</div>
+      <div style="flex:1; min-width:0;">
+        <div style="font-size:13px; font-weight:500;">James Lee</div>
+        <div style="font-size:11px; color:var(--color-text-secondary);">MCA-007 · Adult · (404) 555-0623</div>
+      </div>
+      <span class="badge badge-adv">Advanced</span>
+      <span class="badge badge-online">Online</span>
+      <span class="badge badge-paid">Paid</span>
+      <span class="badge badge-active">Active</span>
+    </div>
+    <div class="student-row">
+      <div class="avatar" style="background:#EEEDFE; color:#3C3489;">ZP</div>
+      <div style="flex:1; min-width:0;">
+        <div style="font-size:13px; font-weight:500;">Zara Patel</div>
+        <div style="font-size:11px; color:var(--color-text-secondary);">MCA-008 · Meera Patel · (404) 555-0789</div>
+      </div>
+      <span class="badge badge-int">Intermediate</span>
+      <span class="badge badge-both">Both</span>
+      <span class="badge badge-paid">Paid</span>
+      <span class="badge badge-active">Active</span>
+    </div>
+    <div style="margin-top:10px; text-align:center;">
+      <button class="btn-ghost" onclick="sendPrompt('Show me all 100 Mohar Chess Academy students with filtering options')">Load all 100 students ↗</button>
+    </div>
+  </div>
+</div>
+
+<!-- ONBOARDING -->
+<div id="onboarding" class="panel">
+  <div class="card" style="margin-bottom:12px;">
+    <div class="section-title">Automated onboarding — new student registration</div>
+    <div style="font-size:12px; color:var(--color-text-secondary); margin-bottom:14px;">This form auto-generates a student ID, sends a welcome email, and adds the student to all trackers.</div>
+
+    <div class="form-row">
+      <div><div class="form-label">First name</div><input type="text" placeholder="e.g. Aiden"/></div>
+      <div><div class="form-label">Last name</div><input type="text" placeholder="e.g. Parker"/></div>
+    </div>
+    <div class="form-row">
+      <div><div class="form-label">Date of birth</div><input type="text" placeholder="YYYY-MM-DD"/></div>
+      <div><div class="form-label">Parent / guardian name</div><input type="text" placeholder="Full name"/></div>
+    </div>
+    <div class="form-row">
+      <div><div class="form-label">Parent email</div><input type="email" placeholder="parent@email.com"/></div>
+      <div><div class="form-label">Contact phone</div><input type="text" placeholder="(404) 555-0000"/></div>
+    </div>
+    <div class="form-row">
+      <div>
+        <div class="form-label">Level</div>
+        <select><option>Beginner</option><option>Intermediate</option><option>Advanced</option></select>
+      </div>
+      <div>
+        <div class="form-label">Session type</div>
+        <select><option>In-Person</option><option>Online</option><option>Both</option></select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div>
+        <div class="form-label">Group / class</div>
+        <select><option>Group A</option><option>Group B</option><option>Group C</option><option>Adult Open</option></select>
+      </div>
+      <div>
+        <div class="form-label">Monthly fee ($)</div>
+        <input type="number" placeholder="75"/>
+      </div>
+    </div>
+    <div style="margin-bottom:12px;">
+      <div class="form-label">Additional notes</div>
+      <textarea rows="2" placeholder="Any special needs, prior chess experience, etc."></textarea>
+    </div>
+    <div style="display:flex; gap:8px; align-items:center;">
+      <button class="btn-primary" onclick="submitOnboarding()">Enroll student + send welcome email</button>
+      <button class="btn-ghost" onclick="sendPrompt('Generate a welcome email template for new Mohar Chess Academy students')">Preview welcome email ↗</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">Onboarding checklist — auto-triggered on enrollment</div>
+    <div id="onboardChecklist">
+      <div class="fee-row"><span>Generate student ID (MCA-XXX)</span><span class="badge badge-paid">Auto</span></div>
+      <div class="fee-row"><span>Add to student roster</span><span class="badge badge-paid">Auto</span></div>
+      <div class="fee-row"><span>Add to attendance tracker</span><span class="badge badge-paid">Auto</span></div>
+      <div class="fee-row"><span>Add to fee tracker</span><span class="badge badge-paid">Auto</span></div>
+      <div class="fee-row"><span>Send welcome email to parent</span><span class="badge badge-paid">Auto</span></div>
+      <div class="fee-row"><span>Send Zoom link (if online/both)</span><span class="badge badge-paid">Auto</span></div>
+      <div class="fee-row"><span>Assign to Google Classroom</span><span class="badge badge-paid">Auto</span></div>
+      <div class="fee-row"><span>Schedule first lesson reminder</span><span class="badge badge-paid">Auto</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- FEES -->
+<div id="fees" class="panel">
+  <div style="display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-bottom:12px;">
+    <div class="metric">
+      <div class="metric-label">Total collected</div>
+      <div class="metric-value" style="color:var(--color-text-success);">$6,150</div>
+      <div class="metric-sub">This month</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Outstanding</div>
+      <div class="metric-value" style="color:#993C1D;">$1,350</div>
+      <div class="metric-sub">12 students</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Collection rate</div>
+      <div class="metric-value">82%</div>
+      <div class="metric-sub">Target: 95%</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:12px;">
+    <div class="section-title">Fee intelligence — overdue alerts</div>
+    <div class="fee-row">
+      <div><div style="font-size:13px; font-weight:500;">Emma Williams</div><div style="font-size:11px; color:var(--color-text-secondary);">4 months overdue · In-person · $75/mo</div></div>
+      <div style="text-align:right;"><div style="font-size:14px; font-weight:500; color:#993C1D;">$300</div><button class="btn-ghost" onclick="sendPrompt('Write a firm but polite overdue fee reminder for Emma Williams at Mohar Chess Academy, 4 months overdue')">Remind ↗</button></div>
+    </div>
+    <div class="fee-row">
+      <div><div style="font-size:13px; font-weight:500;">Noah Johnson</div><div style="font-size:11px; color:var(--color-text-secondary);">2 months overdue · Online · $60/mo</div></div>
+      <div style="text-align:right;"><div style="font-size:14px; font-weight:500; color:#993C1D;">$120</div><button class="btn-ghost" onclick="sendPrompt('Write a polite fee reminder for Noah Johnson at Mohar Chess Academy, 2 months overdue')">Remind ↗</button></div>
+    </div>
+    <div class="fee-row">
+      <div><div style="font-size:13px; font-weight:500;">Priya Sharma</div><div style="font-size:11px; color:var(--color-text-secondary);">Invoice sent · Both · $90/mo</div></div>
+      <div style="text-align:right;"><div style="font-size:14px; font-weight:500; color:#854F0B;">$90</div><button class="btn-ghost" onclick="sendPrompt('Write a gentle payment follow-up for Priya Sharma at Mohar Chess Academy')">Follow up ↗</button></div>
+    </div>
+    <div class="fee-row">
+      <div><div style="font-size:13px; font-weight:500;">Liam Chen</div><div style="font-size:11px; color:var(--color-text-secondary);">Partial payment · In-person · $75/mo</div></div>
+      <div style="text-align:right;"><div style="font-size:14px; font-weight:500; color:#854F0B;">$25</div><button class="btn-ghost" onclick="sendPrompt('Write a short note to Liam Chens parent about the outstanding $25 balance at Mohar Chess Academy')">Remind ↗</button></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">Fee rates — ES Team production cost included</div>
+    <div class="fee-row"><span>In-person only</span><span style="font-weight:500; color:#0F6E56;">$75 / month</span></div>
+    <div class="fee-row"><span>Online (Zoom / Meet) only</span><span style="font-weight:500; color:#534AB7;">$60 / month</span></div>
+    <div class="fee-row"><span>Both sessions</span><span style="font-weight:500; color:#E8751A;">$90 / month</span></div>
+    <div class="fee-row"><span>Annual (paid upfront, 10% off)</span><span style="font-weight:500; color:#7B5230;">from $648 / year</span></div>
+    <div style="margin-top:10px;">
+      <button class="btn-ghost" onclick="sendPrompt('Create a fee payment policy document for Mohar Chess Academy including late fees and refund policy')">Generate fee policy doc ↗</button>
+    </div>
+  </div>
+</div>
+
+<!-- ATTENDANCE -->
+<div id="attendance" class="panel">
+  <div style="display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-bottom:12px;">
+    <div class="metric"><div class="metric-label">In-person avg</div><div class="metric-value" style="color:#0F6E56;">89%</div><div class="metric-sub">This month</div></div>
+    <div class="metric"><div class="metric-label">Online avg</div><div class="metric-value" style="color:#534AB7;">85%</div><div class="metric-sub">This month</div></div>
+    <div class="metric"><div class="metric-label">At-risk students</div><div class="metric-value" style="color:#993C1D;">6</div><div class="metric-sub">Below 70% attendance</div></div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+      <div class="section-title" style="margin:0;">Weekly attendance — mark present / absent / late</div>
+      <div style="display:flex; gap:6px;">
+        <span style="font-size:11px; background:#E1F5EE; color:#085041; padding:2px 7px; border-radius:4px; font-weight:500;">P present</span>
+        <span style="font-size:11px; background:#FAECE7; color:#712B13; padding:2px 7px; border-radius:4px; font-weight:500;">A absent</span>
+        <span style="font-size:11px; background:#FAEEDA; color:#633806; padding:2px 7px; border-radius:4px; font-weight:500;">L late</span>
+      </div>
+    </div>
+    <div id="attGrid">
+      <div style="display:flex; align-items:center; gap:8px; padding:6px 0; border-bottom:0.5px solid var(--color-border-tertiary); font-size:11px; color:var(--color-text-secondary);">
+        <div style="width:140px;">Student</div>
+        <div style="width:60px; text-align:center;">Type</div>
+        <div style="flex:1; display:flex; gap:4px;">
+          <div style="width:28px; text-align:center;">Wk1</div><div style="width:28px; text-align:center;">Wk2</div><div style="width:28px; text-align:center;">Wk3</div><div style="width:28px; text-align:center;">Wk4</div><div style="width:28px; text-align:center;">Wk5</div><div style="width:28px; text-align:center;">Wk6</div>
+        </div>
+        <div style="width:50px; text-align:center;">Rate</div>
+      </div>
+    </div>
+    <div style="margin-top:10px;">
+      <button class="btn-ghost" onclick="sendPrompt('Import my Zoom attendance report into the Mohar Chess Academy attendance tracker')">Import Zoom report ↗</button>
+    </div>
+  </div>
+</div>
+
+<!-- PERFORMANCE -->
+<div id="performance" class="panel">
+  <div style="display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-bottom:12px;">
+    <div class="metric"><div class="metric-label">Academy avg score</div><div class="metric-value mca-orange">3.8 / 5</div><div class="metric-sub">Across all students</div></div>
+    <div class="metric"><div class="metric-label">Ready to advance</div><div class="metric-value" style="color:#0F6E56;">14</div><div class="metric-sub">Students at 4.5+</div></div>
+    <div class="metric"><div class="metric-label">Need attention</div><div class="metric-value" style="color:#993C1D;">8</div><div class="metric-sub">Students below 2.5</div></div>
+  </div>
+
+  <div class="card" style="margin-bottom:12px;">
+    <div class="section-title">Student performance — skill matrix</div>
+    <div id="perfGrid"></div>
+    <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
+      <button class="btn-ghost" onclick="sendPrompt('Generate individual progress reports for all Mohar Chess Academy students ready to advance to the next level')">Generate progress reports ↗</button>
+      <button class="btn-ghost" onclick="sendPrompt('Which Mohar Chess Academy students are ready for tournament play based on their performance scores?')">Tournament readiness ↗</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">Performance by level</div>
+    <div style="display:flex; flex-direction:column; gap:10px;" id="levelPerf"></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const students = [
+  {id:'MCA-001',name:'Aiden Parker',initials:'AP',level:'Beginner',session:'In-Person',fee:'Paid',status:'Active',color:'#FAEEDA',tc:'#633806',scores:[5,4,3,2,2,1,2]},
+  {id:'MCA-002',name:'Priya Sharma',initials:'PS',level:'Intermediate',session:'Both',fee:'Unpaid',status:'Active',color:'#EEEDFE',tc:'#3C3489',scores:[5,5,4,4,3,3,4]},
+  {id:'MCA-003',name:'Liam Chen',initials:'LC',level:'Beginner',session:'In-Person',fee:'Partial',status:'Active',color:'#E1F5EE',tc:'#085041',scores:[4,3,2,2,1,1,1]},
+  {id:'MCA-004',name:'Sofia Martinez',initials:'SM',level:'Advanced',session:'Both',fee:'Paid',status:'Active',color:'#1A1A1A',tc:'#E8751A',scores:[5,5,5,5,5,4,5]},
+  {id:'MCA-005',name:'Noah Johnson',initials:'NJ',level:'Intermediate',session:'Online',fee:'Unpaid',status:'Active',color:'#EEEDFE',tc:'#3C3489',scores:[5,5,4,3,3,2,3]},
+  {id:'MCA-006',name:'Emma Williams',initials:'EW',level:'Beginner',session:'In-Person',fee:'Unpaid',status:'Inactive',color:'#FAECE7',tc:'#712B13',scores:[3,3,2,2,1,1,1]},
+  {id:'MCA-007',name:'James Lee',initials:'JL',level:'Advanced',session:'Online',fee:'Paid',status:'Active',color:'#1A1A1A',tc:'#E8751A',scores:[5,5,5,5,4,5,5]},
+  {id:'MCA-008',name:'Zara Patel',initials:'ZP',level:'Intermediate',session:'Both',fee:'Paid',status:'Active',color:'#EEEDFE',tc:'#3C3489',scores:[5,4,4,3,3,2,3]},
+];
+
+const attData = [
+  {name:'Aiden Parker',session:'In-Person',att:['P','P','P','A','P','P']},
+  {name:'Priya Sharma',session:'Both',att:['P','P','A','P','P','P']},
+  {name:'Liam Chen',session:'In-Person',att:['P','A','P','P','P','P']},
+  {name:'Sofia Martinez',session:'Both',att:['P','P','P','P','P','P']},
+  {name:'Noah Johnson',session:'Online',att:['A','P','P','P','P','A']},
+  {name:'Emma Williams',session:'In-Person',att:['P','P','P','P','A','P']},
+  {name:'James Lee',session:'Online',att:['P','P','P','A','P','P']},
+  {name:'Zara Patel',session:'Both',att:['P','P','P','P','P','A']},
+];
+
+const skills = ['Pieces','Check','Tactics','Openings','Endgame','Strategy','Tournament'];
+
+function scoreColor(v) {
+  if(v>=5) return {bg:'#E1F5EE',tc:'#085041'};
+  if(v>=4) return {bg:'#E6F1FB',tc:'#0C447C'};
+  if(v>=3) return {bg:'#FAEEDA',tc:'#633806'};
+  if(v>=2) return {bg:'#FAECE7',tc:'#712B13'};
+  return {bg:'#F1EFE8',tc:'#444441'};
+}
+
+function showPanel(id, el) {
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(el) el.classList.add('active');
+}
+
+function submitOnboarding() {
+  const inputs = document.querySelectorAll('#onboarding input, #onboarding select, #onboarding textarea');
+  const firstName = inputs[0].value || 'New Student';
+  alert('Student enrolled! ID generated: MCA-' + (100 + Math.floor(Math.random()*900)) + '. Welcome email queued for ' + firstName + '.');
+  inputs.forEach(i=>{ if(i.tagName!=='SELECT') i.value=''; });
+}
+
+function filterStudents(val) { }
+
+function buildAttGrid() {
+  const grid = document.getElementById('attGrid');
+  attData.forEach(s => {
+    const pct = Math.round((s.att.filter(a=>a==='P').length/s.att.length)*100);
+    const cells = s.att.map(a=>`<div class="att-cell att-${a}" title="Click to change">${a}</div>`).join('');
+    const stBadge = s.session==='In-Person'?'badge-inperson':s.session==='Online'?'badge-online':'badge-both';
+    grid.innerHTML += `<div class="student-row"><div style="width:140px;font-size:13px;font-weight:500;">${s.name}</div><div style="width:60px;"><span class="badge ${stBadge}" style="font-size:10px;">${s.session==='In-Person'?'IP':s.session==='Online'?'OL':'Both'}</span></div><div style="flex:1;display:flex;gap:4px;">${cells}</div><div style="width:50px;text-align:center;font-size:13px;font-weight:500;color:${pct>=80?'#085041':pct>=60?'#633806':'#712B13'}">${pct}%</div></div>`;
+  });
+}
+
+function buildPerfGrid() {
+  const grid = document.getElementById('perfGrid');
+  const header = `<div style="display:flex;align-items:center;gap:6px;padding:6px 0;border-bottom:0.5px solid var(--color-border-tertiary);font-size:11px;color:var(--color-text-secondary);"><div style="width:130px;">Student</div>${skills.map(s=>`<div style="width:60px;text-align:center;">${s}</div>`).join('')}<div style="width:50px;text-align:center;">Avg</div></div>`;
+  grid.innerHTML = header;
+  students.forEach(s => {
+    const avg = (s.scores.reduce((a,b)=>a+b,0)/s.scores.length).toFixed(1);
+    const avgC = scoreColor(parseFloat(avg));
+    const cells = s.scores.map(v=>{ const c=scoreColor(v); return `<div style="width:60px;text-align:center;"><span style="background:${c.bg};color:${c.tc};font-size:11px;font-weight:500;padding:3px 8px;border-radius:4px;">${v}</span></div>`; }).join('');
+    grid.innerHTML += `<div style="display:flex;align-items:center;gap:6px;padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary);"><div style="width:130px;font-size:13px;font-weight:500;">${s.name}</div>${cells}<div style="width:50px;text-align:center;"><span style="background:${avgC.bg};color:${avgC.tc};font-size:12px;font-weight:500;padding:3px 8px;border-radius:4px;">${avg}</span></div></div>`;
+  });
+}
+
+function buildLevelPerf() {
+  const levels = ['Beginner','Intermediate','Advanced'];
+  const colors = {Beginner:'#854F0B',Intermediate:'#534AB7',Advanced:'#E8751A'};
+  const avgs = {Beginner:2.4,Intermediate:3.8,Advanced:4.8};
+  const lp = document.getElementById('levelPerf');
+  levels.forEach(l=>{
+    const pct = Math.round((avgs[l]/5)*100);
+    lp.innerHTML += `<div><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;"><span style="font-weight:500;">${l}</span><span style="color:${colors[l]};font-weight:500;">${avgs[l]} / 5 avg</span></div><div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${colors[l]};"></div></div></div>`;
+  });
+}
+
+buildAttGrid();
+buildPerfGrid();
+buildLevelPerf();
+</script>

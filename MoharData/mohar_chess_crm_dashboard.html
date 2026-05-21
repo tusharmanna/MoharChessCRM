@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mohar Chess Academy — CRM Dashboard</title>
+<style>
+:root {
+  --orange: #E8751A;
+  --orange-dark: #D06618;
+  --bg: #FAF7F2;
+  --panel: #FFFFFF;
+  --panel-2: #F5F1EA;
+  --ink: #1A1A1A;
+  --ink-2: #4A4036;
+  --muted: #847566;
+  --line: #E5DCCD;
+  --green: #0F6E56;
+  --red: #993C1D;
+  --amber: #854F0B;
+  --indigo: #3C3489;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: var(--bg); color: var(--ink); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif; font-size: 14px; line-height: 1.4; }
+.wrap { max-width: 1280px; margin: 0 auto; padding: 18px; }
+.header { background:#1A1A1A; border-radius:12px; padding:16px 22px; margin-bottom:14px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
+.brand { display:flex; align-items:center; gap:14px; }
+.logo { width:44px; height:44px; border-radius:50%; background:var(--orange); display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; color:#1A1A1A; }
+.brand-title { font-size:17px; font-weight:600; color:var(--orange); }
+.brand-sub { font-size:11px; color:#A0896E; }
+.year-pill { text-align:right; }
+.year-pill-l { font-size:11px; color:#A0896E; }
+.year-pill-v { font-size:13px; font-weight:600; color:var(--orange); }
+.tabs { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:16px; }
+.tab { background:transparent; border:1px solid var(--line); border-radius:8px; padding:8px 16px; font-size:13px; cursor:pointer; color:var(--ink-2); transition:all .15s; }
+.tab:hover { border-color:var(--orange); color:var(--orange); }
+.tab.active { background:var(--orange); color:#fff; border-color:var(--orange); }
+.panel { display:none; }
+.panel.active { display:block; animation:fadeIn .2s; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(4px);} to{opacity:1;transform:translateY(0);} }
+.grid { display:grid; gap:12px; }
+.grid-4 { grid-template-columns:repeat(4,minmax(0,1fr)); }
+.grid-3 { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.grid-2 { grid-template-columns:repeat(2,minmax(0,1fr)); }
+@media (max-width:900px){ .grid-4{grid-template-columns:repeat(2,1fr);} .grid-3{grid-template-columns:1fr;} .grid-2{grid-template-columns:1fr;} }
+.card { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:18px; }
+.metric { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:16px; }
+.metric-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:6px; font-weight:500; }
+.metric-value { font-size:26px; font-weight:600; color:var(--ink); }
+.metric-value.orange { color:var(--orange); }
+.metric-value.green { color:var(--green); }
+.metric-value.red { color:var(--red); }
+.metric-sub { font-size:11px; color:var(--muted); margin-top:4px; }
+.section-title { font-size:11px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:12px; }
+.row-item { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--line); }
+.row-item:last-child { border-bottom:none; }
+.bar-wrap { height:8px; border-radius:4px; background:var(--panel-2); overflow:hidden; }
+.bar-fill { height:100%; border-radius:4px; transition:width .4s; }
+.avatar { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; flex-shrink:0; }
+.badge { display:inline-block; font-size:10px; padding:3px 9px; border-radius:20px; font-weight:500; white-space:nowrap; }
+.badge-master { background:#FAEEDA; color:#633806; }
+.badge-shakerag { background:#E1F5EE; color:#085041; }
+.badge-ss { background:#EEEDFE; color:#3C3489; }
+.badge-yes { background:#E1F5EE; color:#085041; }
+.badge-no { background:#FAECE7; color:#712B13; }
+.badge-unknown { background:var(--panel-2); color:var(--muted); }
+input[type=text], select { width:100%; border:1px solid var(--line); border-radius:8px; padding:9px 12px; font-size:13px; background:var(--panel); color:var(--ink); font-family:inherit; }
+input[type=text]:focus, select:focus { outline:none; border-color:var(--orange); }
+.btn { background:var(--orange); color:#fff; border:none; border-radius:8px; padding:9px 18px; font-size:13px; cursor:pointer; font-weight:500; font-family:inherit; }
+.btn:hover { background:var(--orange-dark); }
+.btn-ghost { background:transparent; border:1px solid var(--line); color:var(--ink-2); }
+.btn-ghost:hover { border-color:var(--orange); color:var(--orange); }
+.search-bar { display:flex; gap:8px; align-items:center; margin-bottom:14px; flex-wrap:wrap; }
+.search-bar input, .search-bar select { max-width:240px; }
+table.std { width:100%; border-collapse:collapse; font-size:12.5px; }
+table.std th { text-align:left; font-size:10.5px; text-transform:uppercase; color:var(--muted); padding:10px 8px; border-bottom:1px solid var(--line); font-weight:600; letter-spacing:.04em; }
+table.std td { padding:10px 8px; border-bottom:1px solid var(--line); vertical-align:middle; }
+table.std tr:hover { background:var(--panel-2); }
+.year-bar { display:flex; align-items:end; gap:8px; height:140px; padding:8px 0; }
+.year-bar-col { flex:1; display:flex; flex-direction:column; align-items:center; gap:6px; }
+.year-bar-rect { width:100%; background:linear-gradient(180deg,var(--orange) 0%, #C75A12 100%); border-radius:6px 6px 0 0; min-height:6px; transition:opacity .2s; position:relative; }
+.year-bar-rect:hover { opacity:.8; }
+.year-bar-val { font-size:11px; font-weight:600; color:var(--ink); }
+.year-bar-lbl { font-size:11px; color:var(--muted); }
+.legend-row { display:flex; align-items:center; gap:8px; font-size:12px; padding:6px 0; }
+.legend-dot { width:10px; height:10px; border-radius:3px; flex-shrink:0; }
+.empty-msg { text-align:center; padding:30px; color:var(--muted); font-size:13px; }
+.pagination { display:flex; gap:6px; justify-content:center; margin-top:14px; align-items:center; flex-wrap:wrap; }
+.page-btn { background:var(--panel); border:1px solid var(--line); padding:6px 11px; font-size:12px; border-radius:6px; cursor:pointer; color:var(--ink-2); }
+.page-btn:hover { border-color:var(--orange); }
+.page-btn.active { background:var(--orange); color:#fff; border-color:var(--orange); }
+.contact-line { font-size:11px; color:var(--muted); }
+.tag-pill { display:inline-block; font-size:10px; background:var(--panel-2); color:var(--ink-2); padding:2px 8px; border-radius:10px; margin-right:4px; }
+.detail-grid { display:grid; grid-template-columns: 1fr 2fr; gap:12px 18px; padding:8px 0; }
+.detail-key { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; }
+.detail-val { font-size:13px; color:var(--ink); word-break:break-word; }
+.modal-bg { position:fixed; inset:0; background:rgba(20,20,20,.55); display:none; align-items:center; justify-content:center; z-index:50; padding:20px; }
+.modal-bg.show { display:flex; }
+.modal { background:var(--panel); border-radius:14px; max-width:560px; width:100%; max-height:88vh; overflow:auto; padding:24px; position:relative; }
+.modal-close { position:absolute; top:14px; right:14px; background:none; border:none; font-size:22px; cursor:pointer; color:var(--muted); line-height:1; }
+.modal-close:hover { color:var(--ink); }
+.modal h3 { font-size:18px; font-weight:600; margin-bottom:6px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="header">
+  <div class="brand">
+    <div class="logo">&#9823;</div>
+    <div>
+      <div class="brand-title">Mohar Chess Academy</div>
+      <div class="brand-sub">Student CRM &middot; Mini ERP dashboard</div>
+    </div>
+  </div>
+  <div class="year-pill">
+    <div class="year-pill-l">Academic year</div>
+    <div class="year-pill-v">2024 &ndash; 2025</div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" data-tab="dashboard">Dashboard</button>
+  <button class="tab" data-tab="students">Students</button>
+  <button class="tab" data-tab="schools">Schools</button>
+  <button class="tab" data-tab="onboarding">Onboarding</button>
+  <button class="tab" data-tab="alumni">Past students</button>
+</div>
+
+<!-- DASHBOARD -->
+<div id="tab-dashboard" class="panel active">
+
+  <div class="grid grid-4" style="margin-bottom:14px;">
+    <div class="metric">
+      <div class="metric-label">Active students</div>
+      <div class="metric-value orange">183</div>
+      <div class="metric-sub">Across 3 programs</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Avg student age</div>
+      <div class="metric-value">8.5</div>
+      <div class="metric-sub">Based on 132 records</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Past students</div>
+      <div class="metric-value">76</div>
+      <div class="metric-sub">Pre-2025 alumni</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">SS Montessori revenue</div>
+      <div class="metric-value green">$375</div>
+      <div class="metric-sub">12 students &middot; $75/each</div>
+    </div>
+  </div>
+
+  <div class="grid grid-2" style="margin-bottom:14px;">
+    <div class="card">
+      <div class="section-title">Registrations by year</div>
+      <div class="year-bar">
+        <div class="year-bar-col">
+          <div class="year-bar-val">31</div>
+          <div class="year-bar-rect" style="height:40.8%;" title="2022: 31 students"></div>
+          <div class="year-bar-lbl">2022</div>
+        </div>
+        <div class="year-bar-col">
+          <div class="year-bar-val">48</div>
+          <div class="year-bar-rect" style="height:63.2%;" title="2023: 48 students"></div>
+          <div class="year-bar-lbl">2023</div>
+        </div>
+        <div class="year-bar-col">
+          <div class="year-bar-val">76</div>
+          <div class="year-bar-rect" style="height:100.0%;" title="2024: 76 students"></div>
+          <div class="year-bar-lbl">2024</div>
+        </div>
+        <div class="year-bar-col">
+          <div class="year-bar-val">14</div>
+          <div class="year-bar-rect" style="height:18.4%;" title="2025: 14 students"></div>
+          <div class="year-bar-lbl">2025</div>
+        </div>
+      </div>
+      <div style="font-size:11px; color:var(--muted); border-top:1px solid var(--line); padding-top:10px; margin-top:10px;">Master Contact List 2025 timestamps</div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">Program / school breakdown</div>
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        <div>
+          <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:5px;"><span>Mohar Chess (Master 2025)</span><span style="font-weight:600;">130 (71%)</span></div>
+          <div class="bar-wrap"><div class="bar-fill" style="width:71.0%; background:#E8751A;"></div></div>
+        </div>
+        <div>
+          <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:5px;"><span>Shakerag Elementary</span><span style="font-weight:600;">41 (22%)</span></div>
+          <div class="bar-wrap"><div class="bar-fill" style="width:22.4%; background:#0F6E56;"></div></div>
+        </div>
+        <div>
+          <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:5px;"><span>Sharon Springs Montessori</span><span style="font-weight:600;">12 (7%)</span></div>
+          <div class="bar-wrap"><div class="bar-fill" style="width:6.6%; background:#3C3489;"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <div class="section-title">Age distribution</div>
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div>
+          <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px;"><span>Ages 4-6</span><span style="font-weight:600;">29</span></div>
+          <div class="bar-wrap"><div class="bar-fill" style="width:15.8%; background:#854F0B;"></div></div>
+        </div>
+        <div>
+          <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px;"><span>Ages 7-9</span><span style="font-weight:600;">61</span></div>
+          <div class="bar-wrap"><div class="bar-fill" style="width:33.3%; background:#E8751A;"></div></div>
+        </div>
+        <div>
+          <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px;"><span>Ages 10-12</span><span style="font-weight:600;">33</span></div>
+          <div class="bar-wrap"><div class="bar-fill" style="width:18.0%; background:#3C3489;"></div></div>
+        </div>
+        <div>
+          <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px;"><span>Ages 13+</span><span style="font-weight:600;">9</span></div>
+          <div class="bar-wrap"><div class="bar-fill" style="width:4.9%; background:#1A1A1A;"></div></div>
+        </div>
+        <div>
+          <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px;"><span>Ages Unknown</span><span style="font-weight:600;">51</span></div>
+          <div class="bar-wrap"><div class="bar-fill" style="width:27.9%; background:#847566;"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">Chess experience (intake survey)</div>
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div>
+          <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px;"><span>New to chess</span><span style="font-weight:600;">59 (32%)</span></div>
+          <div class="bar-wrap"><div class="bar-fill" style="width:32.2%; background:#993C1D;"></div></div>
+        </div>
+        <div>
+          <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px;"><span>Has played chess before</span><span style="font-weight:600;">70 (38%)</span></div>
+          <div class="bar-wrap"><div class="bar-fill" style="width:38.3%; background:#0F6E56;"></div></div>
+        </div>
+        <div>
+          <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px;"><span>Not specified</span><span style="font-weight:600;">54 (30%)</span></div>
+          <div class="bar-wrap"><div class="bar-fill" style="width:29.5%; background:#847566;"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STUDENTS -->
+<div id="tab-students" class="panel">
+  <div class="search-bar">
+    <input type="text" id="search" placeholder="Search by name, parent, email, phone..." oninput="renderStudents()" />
+    <select id="filter-source" onchange="renderStudents()">
+      <option value="">All programs</option>
+      <option value="Master 2025">Mohar Chess (Master)</option>
+      <option value="Shakerag">Shakerag</option>
+      <option value="SS Montessori">SS Montessori</option>
+    </select>
+    <select id="filter-age" onchange="renderStudents()">
+      <option value="">All ages</option>
+      <option value="4-6">4 - 6</option>
+      <option value="7-9">7 - 9</option>
+      <option value="10-12">10 - 12</option>
+      <option value="13+">13+</option>
+    </select>
+    <select id="filter-exp" onchange="renderStudents()">
+      <option value="">Any experience</option>
+      <option value="Yes">Played before</option>
+      <option value="No">New to chess</option>
+    </select>
+    <span id="student-count" style="font-size:12px; color:var(--muted); margin-left:auto;"></span>
+  </div>
+
+  <div class="card" style="padding:8px 18px;">
+    <table class="std">
+      <thead>
+        <tr>
+          <th style="width:34px;"></th>
+          <th>Student</th>
+          <th>Age</th>
+          <th>Parent / contact</th>
+          <th>Phone</th>
+          <th>Email</th>
+          <th>Program</th>
+          <th>Experience</th>
+        </tr>
+      </thead>
+      <tbody id="student-tbody"></tbody>
+    </table>
+    <div class="pagination" id="pagination"></div>
+  </div>
+</div>
+
+<!-- SCHOOLS -->
+<div id="tab-schools" class="panel">
+  <div class="grid grid-3" style="margin-bottom:14px;">
+    <div class="card" style="border-top:3px solid #E8751A;">
+      <div class="section-title">Mohar Chess (Master 2025)</div>
+      <div style="font-size:30px; font-weight:600; color:#E8751A;">130</div>
+      <div style="font-size:12px; color:var(--muted); margin-top:6px;">Main academy roster &middot; multi-year intake</div>
+    </div>
+    <div class="card" style="border-top:3px solid #0F6E56;">
+      <div class="section-title">Shakerag Elementary</div>
+      <div style="font-size:30px; font-weight:600; color:#0F6E56;">41</div>
+      <div style="font-size:12px; color:var(--muted); margin-top:6px;">Aug 2024 cohort &middot; school program</div>
+    </div>
+    <div class="card" style="border-top:3px solid #3C3489;">
+      <div class="section-title">Sharon Springs Montessori</div>
+      <div style="font-size:30px; font-weight:600; color:#3C3489;">12</div>
+      <div style="font-size:12px; color:var(--muted); margin-top:6px;">Paid program &middot; $75/student</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">Sharon Springs Montessori — payment roster</div>
+    <table class="std">
+      <thead><tr><th>Student</th><th>Age</th><th>Parent</th><th>Phone</th><th>Payment</th></tr></thead>
+      <tbody id="ss-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ONBOARDING -->
+<div id="tab-onboarding" class="panel">
+  <div class="card" style="margin-bottom:12px;">
+    <div class="section-title">New student registration</div>
+    <p style="font-size:12px; color:var(--muted); margin-bottom:14px;">Quick-add a student. This form mirrors the Google Form feeding your master contact list.</p>
+
+    <div class="grid grid-2" style="gap:10px; margin-bottom:10px;">
+      <div><label style="font-size:11px; color:var(--muted);">First name</label><input type="text" placeholder="e.g. Aanya" /></div>
+      <div><label style="font-size:11px; color:var(--muted);">Last name</label><input type="text" placeholder="e.g. Patel" /></div>
+    </div>
+    <div class="grid grid-2" style="gap:10px; margin-bottom:10px;">
+      <div><label style="font-size:11px; color:var(--muted);">Age</label><input type="text" placeholder="e.g. 8" /></div>
+      <div>
+        <label style="font-size:11px; color:var(--muted);">Played chess before?</label>
+        <select><option>No</option><option>Yes</option></select>
+      </div>
+    </div>
+    <div class="grid grid-2" style="gap:10px; margin-bottom:10px;">
+      <div><label style="font-size:11px; color:var(--muted);">Parent 1 name</label><input type="text" /></div>
+      <div><label style="font-size:11px; color:var(--muted);">Parent 1 phone</label><input type="text" placeholder="(404) 555-1234" /></div>
+    </div>
+    <div class="grid grid-2" style="gap:10px; margin-bottom:10px;">
+      <div><label style="font-size:11px; color:var(--muted);">Parent 2 name</label><input type="text" /></div>
+      <div><label style="font-size:11px; color:var(--muted);">Parent 2 phone</label><input type="text" /></div>
+    </div>
+    <div class="grid grid-2" style="gap:10px; margin-bottom:14px;">
+      <div><label style="font-size:11px; color:var(--muted);">Email</label><input type="text" placeholder="parent@email.com" /></div>
+      <div>
+        <label style="font-size:11px; color:var(--muted);">Program</label>
+        <select><option>Mohar Chess (Master)</option><option>Shakerag</option><option>SS Montessori</option></select>
+      </div>
+    </div>
+    <button class="btn" onclick="alert('Demo only \u2014 in production this would append to your master spreadsheet and trigger the welcome email.')">Enroll student</button>
+  </div>
+
+  <div class="card">
+    <div class="section-title">Onboarding checklist</div>
+    <div class="row-item"><span style="flex:1; font-size:13px;">Generate student ID (MCA-XXX)</span><span class="badge badge-yes">Auto</span></div>
+    <div class="row-item"><span style="flex:1; font-size:13px;">Add to master contact list</span><span class="badge badge-yes">Auto</span></div>
+    <div class="row-item"><span style="flex:1; font-size:13px;">Send welcome email to parent</span><span class="badge badge-yes">Auto</span></div>
+    <div class="row-item"><span style="flex:1; font-size:13px;">Schedule first lesson</span><span class="badge badge-yes">Auto</span></div>
+    <div class="row-item"><span style="flex:1; font-size:13px;">Add to attendance / fee tracker</span><span class="badge badge-yes">Auto</span></div>
+  </div>
+</div>
+
+<!-- ALUMNI -->
+<div id="tab-alumni" class="panel">
+  <div class="card">
+    <div class="section-title">Past students (Pre-2025) &mdash; 76 alumni</div>
+    <p style="font-size:12px; color:var(--muted); margin-bottom:14px;">First names only on file. Consider a re-engagement campaign &mdash; alumni often refer new families.</p>
+    <div id="alumni-grid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:8px;"></div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-bg" id="modal-bg" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modal">
+    <button class="modal-close" onclick="closeModal()">&times;</button>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const STUDENTS = [{"id": "MCA-001", "ts": "2022-02-06", "email": "shruti500@gmail.com", "first": "Kiaan", "last": "Bumia", "age": "8", "p1_name": "Shruti", "p1_phone": "(678) 975-8767", "p2_name": "Sahil", "p2_phone": "(678) 975-8757", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-002", "ts": "2022-02-13", "email": "madhuriyarakaraju@gmail.com", "first": "Pranavi", "last": "Yarakaraju", "age": "4", "p1_name": "Madhuri Yarakaraju", "p1_phone": "(678) 630-0149", "p2_name": "Gopala", "p2_phone": "(470) 338-3415", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "5 out of 10 \ud83d\ude00", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-003", "ts": "2022-03-07", "email": "pradnyahegde.null@gmail.com", "first": "Dhruv", "last": "Hegde", "age": "12", "p1_name": "Pradnya hegde", "p1_phone": "(404) 491-8263", "p2_name": "Santosh hegde", "p2_phone": "(404) 800-3064", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-004", "ts": "2022-05-17", "email": "anu.shendre@gmail.com", "first": "Om", "last": "Borkar", "age": "9", "p1_name": "Anushri Shendre", "p1_phone": "(218) 474-0010", "p2_name": "Swapnil Borkar", "p2_phone": "(651) 605-1452", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-005", "ts": "2022-05-23", "email": "d.sahu04@gmail.com", "first": "Rajdeep", "last": "Sahu", "age": "8.10 year", "p1_name": "Deepanjali", "p1_phone": "(404) 901-1124", "p2_name": "Rajesh", "p2_phone": "(678) 507-9882", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "He has some knowledge on chess", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-006", "ts": "2022-06-02", "email": "rbrooksmba@gmail.com", "first": "Sophia", "last": "Brooks", "age": "8", "p1_name": "Richard", "p1_phone": "(678) 575-8539", "p2_name": "Kateryna", "p2_phone": "", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-007", "ts": "2022-06-03", "email": "jaya.dwchn@gmail.com", "first": "Kiaan", "last": "Singh", "age": "5 1/2", "p1_name": "Jaya Balakrishnan", "p1_phone": "(502) 494-0295", "p2_name": "Abhishek Singh", "p2_phone": "(201) 314-3910", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-008", "ts": "2022-06-05", "email": "muralid2@gmail.com", "first": "Sohil", "last": "Medatia", "age": "6", "p1_name": "Samhitha Muralidhar Medatia", "p1_phone": "(248) 515-9421", "p2_name": "Amar Medatia", "p2_phone": "(540) 817-9421", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-009", "ts": "2022-06-05", "email": "dixi1203@gmail.com", "first": "Aalya", "last": "Chokshi", "age": "7", "p1_name": "Dixi Chokshi", "p1_phone": "(678) 860-4202", "p2_name": "", "p2_phone": "", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-010", "ts": "2022-06-06", "email": "sridevi.madduri@gmail.com", "first": "Medha", "last": "Tallapareddy", "age": "6", "p1_name": "Sridevi", "p1_phone": "(704) 880-8206", "p2_name": "Sudeep", "p2_phone": "(423) 443-0505", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-011", "ts": "2022-07-25", "email": "sangee.singh@gmail.com", "first": "Akshat", "last": "Singh", "age": "14", "p1_name": "Sangeeta Singh", "p1_phone": "(201) 620-4257", "p2_name": "Abhijeet singh", "p2_phone": "(201) 936-0397", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-012", "ts": "2022-07-26", "email": "himajupudi@gmail.com", "first": "Leela", "last": "Rayabharam", "age": "7", "p1_name": "Raju Rayabharam", "p1_phone": "(339) 293-9748", "p2_name": "Hima Jupudi", "p2_phone": "(857) 445-1033", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-013", "ts": "2022-07-27", "email": "mallicksagarika@gmail.com", "first": "Pratyusha", "last": "Acharya", "age": "8", "p1_name": "Sagarika Mallick", "p1_phone": "(470) 435-0534", "p2_name": "Prabhanjan Acharya", "p2_phone": "(404) 400-9940", "experience": "No", "comments": "Pratyusha is just a beginner. She never played Chess before but she loves to play board games.", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-014", "ts": "2022-08-01", "email": "pandey.neha21@gmail.com", "first": "Prayaan", "last": "Sharma", "age": "6", "p1_name": "Neha Pandey", "p1_phone": "(971) 716-6020", "p2_name": "Manish Sharma", "p2_phone": "(425) 533-3008", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "Beginner", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-015", "ts": "2022-08-02", "email": "roopakottha@gmail.com", "first": "Vihaan", "last": "Basu", "age": "11", "p1_name": "Roopa Kottha", "p1_phone": "(678) 468-4570", "p2_name": "Sudheer Basu", "p2_phone": "(404) 488-6271", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "Advanced Beginner", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-016", "ts": "2022-08-02", "email": "bhavana.jayaram@gmail.com", "first": "Aashil", "last": "Sriram", "age": "6", "p1_name": "Bhavana Jayaram", "p1_phone": "(314) 737-0060", "p2_name": "Kishore Sriram", "p2_phone": "(574) 526-0020", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-017", "ts": "2022-08-02", "email": "meenakshimurugesanj@gmail.com", "first": "Devrishi", "last": "Jayaram", "age": "11", "p1_name": "Jayaram Chinniah", "p1_phone": "(248) 909-5820", "p2_name": "Meenakshi Murugesan", "p2_phone": "(248) 877-0218", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-018", "ts": "2022-08-14", "email": "gagankaur80@yahoo.co.uk", "first": "Bhaavik", "last": "Das", "age": "10", "p1_name": "Gagan preet Das", "p1_phone": "(470) 363-6202", "p2_name": "Surojit Das", "p2_phone": "(678) 231-1742", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "No ranking yet", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-019", "ts": "2022-08-17", "email": "Deepali.karpe@gmail.com", "first": "Aryan", "last": "Senthilkumar", "age": "12", "p1_name": "Deepali Karpe", "p1_phone": "(561) 908-3612", "p2_name": "", "p2_phone": "", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "Not sure of the rankinz", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-020", "ts": "2022-08-17", "email": "deepthi.g6@gmail.com", "first": "Yuvan", "last": "Sudanagunta", "age": "7", "p1_name": "Deepthi Gajjarapu", "p1_phone": "(251) 895-4797", "p2_name": "Gowri Shanker Sudanagunta", "p2_phone": "(251) 253-2008", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "Beginner and basic understanding.", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-021", "ts": "2022-08-18", "email": "courtney.hamill@gmail.com", "first": "Leo", "last": "Crozier", "age": "6", "p1_name": "Courtney Hamill", "p1_phone": "(404) 402-9518", "p2_name": "Jim Crozier", "p2_phone": "(404) 539-9717", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "Just at home.", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-022", "ts": "2022-08-21", "email": "smrutirekha123@gmail.com", "first": "Sarvansh", "last": "Mishra", "age": "10", "p1_name": "Smrutirekha", "p1_phone": "(404) 663-0129", "p2_name": "Sushil Mishra", "p2_phone": "(404) 980-4310", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-023", "ts": "2022-08-22", "email": "pritrohan@gmail.com", "first": "Rikin", "last": "Deshmukh", "age": "8", "p1_name": "Pritam", "p1_phone": "(412) 330-9900", "p2_name": "Rohan", "p2_phone": "(410) 926-8762", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-024", "ts": "2022-08-23", "email": "r.rajib@gmail.com", "first": "Rayan", "last": "Mukherjee", "age": "10", "p1_name": "Rajib Mukherjee", "p1_phone": "(318) 243-3336", "p2_name": "Kanan Thiyam Mukherjee", "p2_phone": "(470) 330-5740", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-025", "ts": "2022-09-06", "email": "uday4347@gmail.com", "first": "Likitha", "last": "Pidikiti", "age": "6", "p1_name": "Uday Pidikiti", "p1_phone": "(334) 819-6243", "p2_name": "Sruthi Yalamanchili", "p2_phone": "(678) 687-0766", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-026", "ts": "2022-09-07", "email": "kumar0619@yahoo.com", "first": "Karthik", "last": "Devakonda", "age": "9", "p1_name": "Kiran devakonda", "p1_phone": "(404) 539-2390", "p2_name": "Soujanya Gandra", "p2_phone": "(678) 431-8440", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-027", "ts": "2022-10-30", "email": "susmita.kundu@gmail.com", "first": "Shinjini", "last": "Mandal", "age": "11", "p1_name": "Susmita kundu", "p1_phone": "(704) 497-2670", "p2_name": "Sandip Mandal", "p2_phone": "(586) 646-0324", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-028", "ts": "2022-11-04", "email": "praveen.kapri@gmail.com", "first": "Harshit", "last": "Kapri", "age": "7", "p1_name": "Praveen Kumar", "p1_phone": "(470) 469-7102", "p2_name": "Swati Kapri", "p2_phone": "(762) 244-0589", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "Beginner Level", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-029", "ts": "2022-12-02", "email": "depz_007@yahoo.com", "first": "Siddharth", "last": "Prasad", "age": "12", "p1_name": "Deepa Singh", "p1_phone": "(602) 585-2808", "p2_name": "480 217 6851", "p2_phone": "", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "Joining classes from December 2022", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-030", "ts": "2022-12-30", "email": "Duttamoumita27@gmail.com", "first": "Aritro", "last": "Dutta", "age": "6", "p1_name": "Moumita Dutta", "p1_phone": "(678) 551-1161", "p2_name": "", "p2_phone": "", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-031", "ts": "2022-12-30", "email": "vikramshivkumar@gmail.com", "first": "Vihaan", "last": "Vikram", "age": "9", "p1_name": "Vikram Shivkumar", "p1_phone": "(404) 754-5099", "p2_name": "Dipali Nemade", "p2_phone": "(404) 804-1722", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-032", "ts": "2023-01-12", "email": "vib.garg@gmail.com", "first": "Shlok", "last": "Pankaj", "age": "9", "p1_name": "Vibha Garg", "p1_phone": "(404) 723-3182", "p2_name": "Sidharath Pankaj", "p2_phone": "(732) 371-3237", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-033", "ts": "2023-01-12", "email": "krupasachinshetty@gmail.com", "first": "deetya", "last": "shetty", "age": "7", "p1_name": "krupa", "p1_phone": "(848) 207-8283", "p2_name": "", "p2_phone": "", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-034", "ts": "2023-01-20", "email": "drgatla@gmail.com", "first": "Deepthi", "last": "Gurram", "age": "13", "p1_name": "Deepthi Gurram", "p1_phone": "(470) 926-3118", "p2_name": "Pranay Gurram", "p2_phone": "(470) 231-8391", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "No Rank yet", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-035", "ts": "2023-01-23", "email": "dimplemd@gmail.com", "first": "Krish", "last": "Patel", "age": "7", "p1_name": "Dimple", "p1_phone": "(630) 440-6325", "p2_name": "Neal", "p2_phone": "(706) 627-0737", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-036", "ts": "2023-01-31", "email": "heinischfamily@yahoo.com", "first": "Zain", "last": "Heinischfamily@yahoo.com", "age": "14", "p1_name": "Sam", "p1_phone": "(404) 401-7200", "p2_name": "Heinz", "p2_phone": "(678) 230-5060", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "No ranking", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-037", "ts": "2023-02-12", "email": "lavanyaa07@gmail.com", "first": "Pranav", "last": "Anandh", "age": "7", "p1_name": "Anandh", "p1_phone": "(470) 847-2249", "p2_name": "Lavanya", "p2_phone": "(470) 298-0076", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-038", "ts": "2023-02-14", "email": "lakshmi.frnd@gmail.com", "first": "Abhishek", "last": "Janga", "age": "10", "p1_name": "Nagalakshmi Yalanati", "p1_phone": "(678) 764-9568", "p2_name": "Ashok babu Janga", "p2_phone": "(770) 807-5863", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "Beginner level", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-039", "ts": "2023-02-24", "email": "gaya3devi.s@gmail.com", "first": "Sai Ratan", "last": "Shankar", "age": "9", "p1_name": "Arishankar Murugarathinam", "p1_phone": "(847) 624-2660", "p2_name": "Gayathri Shanmugam", "p2_phone": "(404) 980-9930", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-040", "ts": "2023-02-24", "email": "ranu.ashu.5@gmail.com", "first": "Ranvijay", "last": "Sharma", "age": "11", "p1_name": "Kanchan Sharma", "p1_phone": "(404) 736-5183", "p2_name": "Renu Sharma", "p2_phone": "(470) 556-4719", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "Online practice", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-041", "ts": "2023-02-27", "email": "cnc2404@gmail.com", "first": "Neehal", "last": "Nadkarni", "age": "13", "p1_name": "Chaitali Nadkarni", "p1_phone": "(678) 733-5357", "p2_name": "Vijay Nadkarni", "p2_phone": "(440) 263-6678", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "Not ranked yet", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-042", "ts": "2023-03-02", "email": "archanapsg.mib@gmail.com", "first": "Viyaan", "last": "Karthikeyan", "age": "6", "p1_name": "Karthikeyan", "p1_phone": "(423) 316-3061", "p2_name": "Archana", "p2_phone": "(423) 227-0636", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-043", "ts": "2023-03-14", "email": "prathima.adusumalli6@gmail.com", "first": "Vaibhav sankar", "last": "Pidikiti", "age": "6", "p1_name": "Prathima Adusumalli", "p1_phone": "(203) 747-5936", "p2_name": "Vijay pidikiti", "p2_phone": "(860) 309-7301", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "Just beginner", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-044", "ts": "2023-03-21", "email": "rswestinah@gmail.com", "first": "Jerrick", "last": "Jayasarathi", "age": "11", "p1_name": "Roseline", "p1_phone": "(470) 362-9021", "p2_name": "Jayasarathi", "p2_phone": "(404) 840-4635", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-045", "ts": "2023-03-23", "email": "mousumi008@gmail.com", "first": "Akshaj", "last": "Das", "age": "5", "p1_name": "mousumi mukherjee", "p1_phone": "(617) 800-3016", "p2_name": "Samiran Das", "p2_phone": "(617) 510-7306", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-046", "ts": "2023-04-08", "email": "vijayfelix.p@gmail.com", "first": "Allen", "last": "Peter", "age": "8", "p1_name": "Felix", "p1_phone": "(470) 519-2849", "p2_name": "Girija", "p2_phone": "(404) 695-6450", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-047", "ts": "2023-07-25", "email": "chitrakg@gmail.com", "first": "Diptarko", "last": "Gupta", "age": "12", "p1_name": "Chitrak Gupta", "p1_phone": "(470) 546-3387", "p2_name": "Aditi Gupta", "p2_phone": "(470) 439-9759", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "NA", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-048", "ts": "2023-07-28", "email": "deepali.charan@gmail.com", "first": "Satvik", "last": "Shrivas", "age": "9", "p1_name": "Deepali charan", "p1_phone": "(470) 923-0544", "p2_name": "Mithlesh Shrivas", "p2_phone": "(470) 920-9802", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-049", "ts": "2023-08-07", "email": "mail2umagopalan@gmail.com", "first": "Rajaselvam", "last": "Jayakumar", "age": "15", "p1_name": "Uma Maheswari gopalan", "p1_phone": "(443) 301-3620", "p2_name": "Jayakumar selvaraju", "p2_phone": "(443) 695-3998", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "500", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-050", "ts": "2023-08-08", "email": "mailhema005@gmail.com", "first": "Nidhi", "last": "Gokyada", "age": "10", "p1_name": "Latha", "p1_phone": "(414) 379-2602", "p2_name": "Ravi", "p2_phone": "(414) 334-9044", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "Beginner", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-051", "ts": "2023-08-09", "email": "mjeyapreetha@gmail.com", "first": "Thejasvee", "last": "Sudhakar Jeya Preetha", "age": "9", "p1_name": "Jeya Preetha Muniasamy", "p1_phone": "(425) 531-5393", "p2_name": "Sudhakar Pandiyan", "p2_phone": "(901) 721-5585", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-052", "ts": "2023-08-09", "email": "pavvari@gmail.com", "first": "Prasanna", "last": "Geddam", "age": "11", "p1_name": "Prasanna Geddam", "p1_phone": "(973) 760-0024", "p2_name": "Giri Geddam", "p2_phone": "(973) 573-9035", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-053", "ts": "2023-08-15", "email": "Miranda.Deng@hotmail.com", "first": "Aiden", "last": "Xu", "age": "6", "p1_name": "Miranda Deng", "p1_phone": "(407) 247-7605", "p2_name": "Peter Xu", "p2_phone": "(407) 242-8319", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "no ranking, Aiden knows the basics rules and played with family for fun", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-054", "ts": "2023-08-16", "email": "icyjeannelij@hotmail.com", "first": "Ella", "last": "Selleck", "age": "6", "p1_name": "Jing Li-Selleck", "p1_phone": "(626) 818-6135", "p2_name": "Jordan Selleck", "p2_phone": "(646) 825-0440", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "Just casually at home", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-055", "ts": "2023-08-16", "email": "mahekaisha@yahoo.com", "first": "Aryan", "last": "Kalbhor", "age": "9", "p1_name": "Vidya Ghag", "p1_phone": "(678) 462-3643", "p2_name": "Mahesh Kalbhor", "p2_phone": "(678) 462-1723", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-056", "ts": "2023-08-16", "email": "dhrtbahl@gmail.com", "first": "Ada", "last": "Duggal", "age": "9", "p1_name": "Dhriti Bahl Duggal", "p1_phone": "(636) 787-7665", "p2_name": "Anand Duggal", "p2_phone": "(512) 542-9928", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "We need help with ranking Ada. Also we need contact details for the teacher for chess.", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-057", "ts": "2023-08-17", "email": "minshencao@yahoo.com", "first": "Raymond", "last": "Cao", "age": "8", "p1_name": "Minshen Cao", "p1_phone": "(404) 384-9545", "p2_name": "Peiling Chen", "p2_phone": "(702) 680-9379", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-058", "ts": "2023-08-18", "email": "saminaahmed11@gmail.com", "first": "Milan", "last": "Abolfathian", "age": "7", "p1_name": "Samina Abolfathian", "p1_phone": "(404) 513-3734", "p2_name": "Mohammad Abolfathian", "p2_phone": "(404) 422-0066", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-059", "ts": "2023-08-20", "email": "srikanth.surikutchi@gmail.com", "first": "Vihaan", "last": "Surikutchi", "age": "5", "p1_name": "Srikanth Surikutchi", "p1_phone": "(862) 754-7084", "p2_name": "Sai Ramani Kompella", "p2_phone": "(862) 414-1632", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-060", "ts": "2023-08-22", "email": "patilsavita6@gmail.com", "first": "Aarush and Vedant", "last": "Patil", "age": "11", "p1_name": "Gayatri(Savita)", "p1_phone": "(216) 573-2499", "p2_name": "Harshad", "p2_phone": "(316) 259-0002", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-061", "ts": "2023-08-22", "email": "kokiarunachalam@gmail.com", "first": "Dharsan", "last": "Gowrishankar", "age": "9", "p1_name": "Gokila Arunachalam", "p1_phone": "(415) 900-9773", "p2_name": "Gowrishankar Duraisamy", "p2_phone": "(502) 939-4854", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "Not into tournaments yet", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-062", "ts": "2023-08-23", "email": "GregoryFamily0419@gmail.com", "first": "William", "last": "Gregory", "age": "10", "p1_name": "Erica Gregory", "p1_phone": "(770) 722-3450", "p2_name": "Blake Gregory", "p2_phone": "(770) 722-3450", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "Ranking? William can beat me easily", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-063", "ts": "2023-08-30", "email": "sushmitha.n@gmail.com", "first": "Medha", "last": "Bhagi", "age": "7", "p1_name": "Sushmitha Bhagi", "p1_phone": "(732) 822-0524", "p2_name": "", "p2_phone": "", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-064", "ts": "2023-08-30", "email": "shilpa.sudeept@gmail.com", "first": "Ishan", "last": "Ponangi", "age": "10", "p1_name": "Shilpa Ponangi", "p1_phone": "(470) 380-5745", "p2_name": "Sudeept ponangi", "p2_phone": "(470) 505-4922", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-065", "ts": "2023-09-05", "email": "maharshi.raghava@gmail.com", "first": "Sri", "last": "Tallapragada", "age": "7", "p1_name": "Raja Tallapragada", "p1_phone": "(470) 231-5378", "p2_name": "Lalithab3@gmail.com", "p2_phone": "(470) 435-3432", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-066", "ts": "2023-09-06", "email": "gvidhu@gmail.com", "first": "Sathvika Varsha", "last": "Ganesan", "age": "7", "p1_name": "Vijji Vidhu", "p1_phone": "(404) 376-7716", "p2_name": "Vidhu Ganesan", "p2_phone": "(630) 886-7491", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-067", "ts": "2023-09-11", "email": "drsunil06@gmail.com", "first": "Reyansh", "last": "Modi", "age": "8", "p1_name": "Sunil kumar", "p1_phone": "(248) 631-6240", "p2_name": "Ritu Kumari", "p2_phone": "(614) 302-6318", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "Basic level", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-068", "ts": "2023-09-14", "email": "vadivelm@gmail.com", "first": "Harish", "last": "Sundaravadivel", "age": "6", "p1_name": "Sundaravadivel Mohanan", "p1_phone": "(919) 699-0497", "p2_name": "Radha Sundaravadivel", "p2_phone": "(703) 992-3065", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-069", "ts": "2023-09-23", "email": "kanwaldeep.sobti@gmail.com", "first": "Pavit", "last": "Sobti", "age": "6", "p1_name": "Kanwaldeep Sobti", "p1_phone": "(678) 767-2983", "p2_name": "Jasleen Sobti", "p2_phone": "(470) 529-7201", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-070", "ts": "2023-09-26", "email": "maneeshmp@gmail.com", "first": "Rihaan", "last": "Maneesh", "age": "7", "p1_name": "Maneesh", "p1_phone": "(470) 682-6484", "p2_name": "Sharanya", "p2_phone": "(470) 682-7108", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-071", "ts": "2023-09-27", "email": "ashamaremaremanda@gmail.com", "first": "Praneeth", "last": "Maremanda", "age": "12", "p1_name": "Venkata", "p1_phone": "(919) 939-4840", "p2_name": "Parimala", "p2_phone": "(919) 939-4842", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-072", "ts": "2023-09-27", "email": "ashamaremanda@gmail.com", "first": "Praneeth", "last": "Maremanda", "age": "12", "p1_name": "Asha Maremnda", "p1_phone": "(919) 939-4842", "p2_name": "", "p2_phone": "", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "231", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-073", "ts": "2023-10-02", "email": "zaaminal@gmail.com", "first": "Rudra", "last": "Zaa", "age": "9", "p1_name": "Minal Zaa", "p1_phone": "(860) 904-0435", "p2_name": "Jitendra Zaa", "p2_phone": "", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "Just know the steps", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-074", "ts": "2023-10-04", "email": "khairajanim@gmail.com", "first": "Riana", "last": "Khairajani", "age": "7", "p1_name": "Mamta khairajani", "p1_phone": "(404) 509-2273", "p2_name": "Rajesh khairajani", "p2_phone": "(404) 988-8430", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "Done beginner level training this summer in India", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-075", "ts": "2023-10-31", "email": "realabu65@gmail.com", "first": "Abdur-Rahman", "last": "Mohammed", "age": "10", "p1_name": "Pasha Mohammed", "p1_phone": "(407) 430-7104", "p2_name": "", "p2_phone": "", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-076", "ts": "2023-11-01", "email": "sulizavi@gmail.com", "first": "Naitik", "last": "Reyansh", "age": "6", "p1_name": "Avijeet Sahoo", "p1_phone": "(513) 602-2190", "p2_name": "Suchismita Jena", "p2_phone": "(513) 212-7936", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-077", "ts": "2023-11-03", "email": "renuka.manoharan19@gmail.com", "first": "Suhansh", "last": "Ramkumar", "age": "4yrs 8months", "p1_name": "Renuka Ramkumar", "p1_phone": "(470) 452-8616", "p2_name": "Ramkumar Jothilingam", "p2_phone": "(470) 452-8615", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-078", "ts": "2023-11-04", "email": "Subhashiniswornappan@gmail.com", "first": "Aadhav", "last": "Madhavan", "age": "8", "p1_name": "Madhavan", "p1_phone": "(404) 242-6766", "p2_name": "Subhashini", "p2_phone": "(678) 667-6719", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-079", "ts": "2023-12-08", "email": "poonamtiwari167@gmail.com", "first": "Aahana", "last": "Tiwari", "age": "9years", "p1_name": "Poonam", "p1_phone": "(973) 979-7391", "p2_name": "", "p2_phone": "", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-080", "ts": "2024-01-07", "email": "gayuramadurai11@gmail.com", "first": "Hareesh", "last": "Muthukumar", "age": "11", "p1_name": "Gayathri  Ramadu", "p1_phone": "(346) 370-5667", "p2_name": "Muthukumar", "p2_phone": "(281) 965-0522", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-081", "ts": "2024-01-08", "email": "sankar.rengas@gmail.com", "first": "Harini", "last": "Sankar", "age": "8", "p1_name": "Sankar R", "p1_phone": "(407) 401-0573", "p2_name": "Rajitha", "p2_phone": "(407) 640-0155", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-082", "ts": "2024-01-13", "email": "er.ghai.shweta@gmail.com", "first": "Navya", "last": "Bhatia", "age": "7", "p1_name": "Shweta Ghai", "p1_phone": "(404) 956-3033", "p2_name": "Gaurav Bhatia", "p2_phone": "(404) 409-5880", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "Unrated", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-083", "ts": "2024-01-18", "email": "rajeshmf4@gmail.com", "first": "Tanvi", "last": "Chedhalla", "age": "7", "p1_name": "Rajesh Chedhalla", "p1_phone": "(339) 205-9234", "p2_name": "Sowmya Sree chigullapally", "p2_phone": "(617) 347-6937", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-084", "ts": "2024-02-07", "email": "vikastandra@gmail.com", "first": "Vaahin", "last": "Tandra", "age": "7", "p1_name": "Vikas Tandra", "p1_phone": "(662) 380-1378", "p2_name": "Alekya Kondam", "p2_phone": "(404) 698-7878", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-085", "ts": "2024-02-12", "email": "vimala.matlapudi@gmail.com", "first": "Vihaan", "last": "Chalamalasetty", "age": "5", "p1_name": "Phanindra Chalamalasetty", "p1_phone": "(209) 689-7211", "p2_name": "Vimala Matlapudi", "p2_phone": "(224) 266-4169", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-086", "ts": "2024-03-01", "email": "gowdhaman.nagamuthu@gmail.com", "first": "Aadhavan", "last": "Gowdhaman", "age": "10", "p1_name": "Gowdhaman Nagamuthu", "p1_phone": "(404) 824-6200", "p2_name": "", "p2_phone": "", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-087", "ts": "2024-03-14", "email": "muralidharachari@gmail.com", "first": "Harshavardhan", "last": "Achari", "age": "13", "p1_name": "Muralidhar", "p1_phone": "", "p2_name": "", "p2_phone": "", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-088", "ts": "2024-03-18", "email": "mishra.ananth@gmail.com", "first": "Avani", "last": "Mishra", "age": "9", "p1_name": "Ananth Mishra", "p1_phone": "(518) 986-0758", "p2_name": "", "p2_phone": "", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-089", "ts": "2024-03-20", "email": "manuthimba17@gmail.com", "first": "Akshara", "last": "Kota", "age": "8yrs", "p1_name": "Suresh Babu Kota", "p1_phone": "(403) 643-5766", "p2_name": "Manuthi Karpakula", "p2_phone": "(404) 717-2286", "experience": "No", "comments": "Home learning", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-090", "ts": "2024-03-22", "email": "sophiajoseph28@gmail.com", "first": "Jessica", "last": "Alfred", "age": "11", "p1_name": "Sophia Joseph", "p1_phone": "(609) 903-1020", "p2_name": "Lourdes Xavier Alfred Raj", "p2_phone": "(201) 349-4909", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "Jessica Alfred - 668", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-091", "ts": "2024-03-28", "email": "snagarajan.suganya@gmail.com", "first": "VISHNU", "last": "DHAMODARA NAYAKEN", "age": "7", "p1_name": "Dhamodara Nayaken Dhandapani", "p1_phone": "(704) 756-4651", "p2_name": "Suganya", "p2_phone": "(980) 298-9297", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-092", "ts": "2024-04-16", "email": "anasuyadg@gmail.com", "first": "Rishi", "last": "Ghosh", "age": "11", "p1_name": "Anasuya Dasgupta", "p1_phone": "(408) 805-1411", "p2_name": "Subhadeep Ghosh", "p2_phone": "(408) 338-7602", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-093", "ts": "2024-05-06", "email": "pritha289@gmail.com", "first": "Riyanshi", "last": "Bagchi", "age": "7", "p1_name": "Pritha Bagchi", "p1_phone": "(404) 227-1631", "p2_name": "Aniruddha", "p2_phone": "(404) 227-0184", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "Not competitive chess", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-094", "ts": "2024-06-03", "email": "kashmiradatar@gmail.com", "first": "Reya", "last": "Datar", "age": "8", "p1_name": "Kashmira", "p1_phone": "(937) 241-3929", "p2_name": "", "p2_phone": "", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-095", "ts": "2024-06-13", "email": "nikhanj30@gmail.com", "first": "Anahitha", "last": "Nikhanj", "age": "4.5", "p1_name": "Nikhanj Rajgopal Raghunadhan", "p1_phone": "(682) 564-6331", "p2_name": "Akshya Vasudevan", "p2_phone": "(470) 519-7184", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-096", "ts": "2024-06-19", "email": "janki.ramani@gmail.com", "first": "Aarjav", "last": "Ramani", "age": "11", "p1_name": "Janki Ramani", "p1_phone": "(678) 900-2995", "p2_name": "Sunil Ramani", "p2_phone": "(678) 941-9451", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "Haven't got ranking yet", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-097", "ts": "2024-06-23", "email": "Varshac159@gmail.com", "first": "Avni ,Angad", "last": "Sambhar", "age": "11 and 7", "p1_name": "Varsha Sambhar", "p1_phone": "(404) 786-6429", "p2_name": "Vinit Sambhar", "p2_phone": "(404) 641-8971", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-098", "ts": "2024-06-26", "email": "indiashaileshsaxena@gmail.com", "first": "Mihit", "last": "Saxena", "age": "13", "p1_name": "Shailesh Kumar", "p1_phone": "(706) 572-3211", "p2_name": "Priyanka Saxena", "p2_phone": "(706) 572-8796", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-099", "ts": "2024-07-16", "email": "surangani.saxena@gmail.com", "first": "Reyaan", "last": "Priyadarshi", "age": "11", "p1_name": "Surangani", "p1_phone": "(331) 444-6268", "p2_name": "", "p2_phone": "", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-100", "ts": "2024-07-29", "email": "bishanc@hotmail.com", "first": "Bivab", "last": "Chandra", "age": "10", "p1_name": "Bishan Chandra", "p1_phone": "(678) 467-6568", "p2_name": "Bhaswati Chandra", "p2_phone": "(678) 559-5347", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-101", "ts": "2024-07-29", "email": "umesh.rath@gmail.com", "first": "Ruhin", "last": "Rath", "age": "9", "p1_name": "Umesh rath", "p1_phone": "(818) 620-6191", "p2_name": "Milani mishra", "p2_phone": "(818) 610-9763", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-102", "ts": "2024-08-02", "email": "siprapal@yahoo.com", "first": "Shourjo", "last": "Chatterjee", "age": "7", "p1_name": "Sipra Pal", "p1_phone": "(469) 891-2848", "p2_name": "Souvik Chatterjee", "p2_phone": "(201) 417-8862", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "USCF Rating 563", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-103", "ts": "2024-08-05", "email": "kskosuru@gmail.com", "first": "Yugan", "last": "Kosuru", "age": "6", "p1_name": "Siva kosuru", "p1_phone": "(309) 550-4574", "p2_name": "Roja", "p2_phone": "(508) 215-7725", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-104", "ts": "2024-08-12", "email": "kruthika006@gmail.com", "first": "Neil", "last": "Ghai", "age": "6", "p1_name": "Kruthika ghai", "p1_phone": "(678) 237-7845", "p2_name": "Anuj ghai", "p2_phone": "(770) 367-7269", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "Basic", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-105", "ts": "2024-08-21", "email": "shilparam2703@gmail.com", "first": "Shamanth", "last": "manjunath", "age": "9", "p1_name": "Shilpa Ramaiah", "p1_phone": "(334) 372-3753", "p2_name": "Manjunath Siddalingaiah", "p2_phone": "(334) 492-0956", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-106", "ts": "2024-09-05", "email": "gharshul2010@gmail.com", "first": "Harshul", "last": "Gupta", "age": "14", "p1_name": "Ajay Gupta", "p1_phone": "(470) 546-1039", "p2_name": "Richa Gupta", "p2_phone": "(470) 546-1865", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "Unranked", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-107", "ts": "2024-09-08", "email": "vivekmody@gmail.com", "first": "Krishiv", "last": "Mody", "age": "7", "p1_name": "Vivek Mody", "p1_phone": "(513) 375-3715", "p2_name": "Mausam Mody", "p2_phone": "(513) 828-9738", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "Beginner", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-108", "ts": "2024-09-09", "email": "sifaandaredia@gmail.com", "first": "Sifaan", "last": "Daredia", "age": "6", "p1_name": "Salima Shanavaz", "p1_phone": "(470) 399-5337", "p2_name": "", "p2_phone": "", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "2", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-109", "ts": "2024-09-26", "email": "anitha.aravindvel@gmail.com", "first": "Athiran", "last": "Velayutham", "age": "5", "p1_name": "Anitha", "p1_phone": "(404) 797-7065", "p2_name": "Aravind", "p2_phone": "(404) 863-5032", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-110", "ts": "2024-10-05", "email": "patelarchit82@gmail.com", "first": "Shaanvi", "last": "Patel", "age": "6", "p1_name": "Archit", "p1_phone": "(404) 457-7789", "p2_name": "Harita", "p2_phone": "(404) 259-7353", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-111", "ts": "2024-10-09", "email": "dev.prakash@gmail.com", "first": "Ryan", "last": "Prakash", "age": "8", "p1_name": "Dev Prakash", "p1_phone": "(470) 413-3960", "p2_name": "Priyanka Mittal", "p2_phone": "(860) 990-9813", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-112", "ts": "2024-10-22", "email": "sundara32@gmail.com", "first": "Arjun", "last": "Manikandan", "age": "10", "p1_name": "Manikandan Chandrasekaran", "p1_phone": "(214) 478-3474", "p2_name": "Abi Senthivel", "p2_phone": "(214) 502-1326", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-113", "ts": "2024-10-26", "email": "ajayshah68@gmail.com", "first": "Aayra", "last": "Shah", "age": "7", "p1_name": "Ajay Shah", "p1_phone": "(678) 640-7873", "p2_name": "Kinjal Shah", "p2_phone": "(678) 640-7856", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-114", "ts": "2024-12-08", "email": "anujchauhan03@gmail.com", "first": "Riaan", "last": "Chauhan", "age": "9", "p1_name": "Anuj Chauhan", "p1_phone": "(309) 533-6386", "p2_name": "Richa Singh Dangi", "p2_phone": "(309) 533-8797", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "750", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-115", "ts": "2024-12-30", "email": "rananjaysingh2506@gmail.com", "first": "Rananjay", "last": "Singh", "age": "10", "p1_name": "Ajay Singh Rathore", "p1_phone": "(413) 204-7967", "p2_name": "", "p2_phone": "", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-116", "ts": "2025-01-01", "email": "nehamshah81@gmail.com", "first": "Shiven", "last": "Shah", "age": "10", "p1_name": "Neha shah", "p1_phone": "(973) 570-3682", "p2_name": "Mehul shah", "p2_phone": "(732) 406-7551", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "Just for fun", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-117", "ts": "2025-01-04", "email": "minalagrawal@gmail.com", "first": "Arjun", "last": "Majumder", "age": "9", "p1_name": "Minal Agrawal", "p1_phone": "(706) 461-4253", "p2_name": "Anirban Majumder", "p2_phone": "(706) 254-2862", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "unrated", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-118", "ts": "2025-01-04", "email": "komalvruparel@gmail.com", "first": "Ziva", "last": "Ruparel", "age": "7.5", "p1_name": "Komal Ruparel", "p1_phone": "(404) 934-8636", "p2_name": "Vivek Ruparel", "p2_phone": "(678) 485-0570", "experience": "No", "comments": "Monday batch - 6pm", "batch": "Monday batch - 6pm", "source": "Master 2025", "status": "active"}, {"id": "MCA-119", "ts": "2025-01-04", "email": "pkatukuri5@gmail.com", "first": "Anvita Reddy", "last": "Katukuri", "age": "7", "p1_name": "Praveen Katukuri", "p1_phone": "(717) 982-4321", "p2_name": "Sindhura Challa", "p2_phone": "(470) 886-3500", "experience": "No", "comments": "Knew the basics of Chess", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-120", "ts": "2025-01-05", "email": "sadam.anjali@gmail.com", "first": "Nagashrija", "last": "Sadam", "age": "12", "p1_name": "Anjali", "p1_phone": "(470) 240-7434", "p2_name": "Venugopal", "p2_phone": "(408) 582-2759", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-121", "ts": "2025-01-06", "email": "arjun.prabhulal@gmail.com", "first": "Sejal", "last": "Sencha", "age": "7", "p1_name": "Arjun Prabhulal", "p1_phone": "(737) 781-1908", "p2_name": "", "p2_phone": "", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-122", "ts": "2025-01-06", "email": "polarb2110@gmail.com", "first": "Sanay", "last": "Vasudeva", "age": "9", "p1_name": "Suneja Panda", "p1_phone": "(770) 617-4022", "p2_name": "Nikhil Vasudeva", "p2_phone": "(470) 889-4625", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "I", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-123", "ts": "", "email": "", "first": "Samuel (Sam)", "last": "", "age": "", "p1_name": "Jenny", "p1_phone": "(404) 713-4437", "p2_name": "", "p2_phone": "", "experience": "", "comments": "", "batch": "thursday 6.30 pm batch", "source": "Master 2025", "status": "active"}, {"id": "MCA-124", "ts": "2025-01-10", "email": "satyapradeep9@gmail.com", "first": "Sanvika", "last": "Bandanakanty", "age": "8", "p1_name": "Satya", "p1_phone": "(678) 436-1655", "p2_name": "Bhargavi", "p2_phone": "(470) 832-0448", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-125", "ts": "2025-01-16", "email": "sreejithnatural@gmail.com", "first": "Liyan", "last": "Sreejith", "age": "7", "p1_name": "Sreejith Rajagopalan", "p1_phone": "(470) 461-7345", "p2_name": "Aiswarya Saralamony", "p2_phone": "(404) 429-6079", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-126", "ts": "2025-01-22", "email": "ljciak@gmail.com", "first": "Nolan", "last": "Ciak", "age": "9", "p1_name": "Leslie Ciak", "p1_phone": "(732) 673-1834", "p2_name": "Jeremy Ciak", "p2_phone": "(770) 714-2248", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "Current rating is 957. Did Kid chess club for 3 semesters. Private lessons and some virtual group lessons. Advanced camp at Walker last summer. Play on chess.com with friends and at tournaments.", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-127", "ts": "2025-01-30", "email": "suryabandaru223@gmail.com", "first": "Mihira", "last": "Bandaru", "age": "5", "p1_name": "Surya Bandaru", "p1_phone": "(678) 908-1069", "p2_name": "Sireesha Marri", "p2_phone": "(678) 707-2916", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-128", "ts": "2025-02-11", "email": "sayli.deshmukh@gmail.com", "first": "Riaan", "last": "Deshpande", "age": "8", "p1_name": "Sayli", "p1_phone": "(205) 212-0550", "p2_name": "Aditya", "p2_phone": "(979) 209-4506", "experience": "No", "comments": "", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-129", "ts": "2025-03-04", "email": "shilpashreeyaroy@googlemail.com", "first": "Shivani", "last": "Roy", "age": "13", "p1_name": "Shilpa", "p1_phone": "(719) 964-4534", "p2_name": "Sandip", "p2_phone": "(914) 255-5469", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "Started few months back", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-130", "ts": "2025-03-05", "email": "mvittalreddy@gmail.com", "first": "Ishanvi Reddy", "last": "Mareddy", "age": "9", "p1_name": "Vittal Reddy", "p1_phone": "(609) 937-4787", "p2_name": "Jhansi", "p2_phone": "(862) 213-5530", "experience": "Yes (if yes, put down the ranking in comments)", "comments": "Didn't played any computations but i do play chess with friends regularly", "batch": "", "source": "Master 2025", "status": "active"}, {"id": "MCA-131", "ts": "2024-08-01", "email": "arat4family@gmail.com", "first": "Sreejith", "last": "Aa", "age": "", "p1_name": "", "p1_phone": "(678) 557-1248", "p2_name": "", "p2_phone": "", "experience": "", "comments": "Shakerag Elementary", "batch": "Shakerag program", "source": "Shakerag", "status": "active"}, {"id": "MCA-132", "ts": "2024-08-01", "email": "angie032111@gmail.com", "first": "Keum", "last": "Lee", "age": "", "p1_name": "", "p1_phone": "(404) 918-1792", "p2_name": "", "p2_phone": "", "experience": "", "comments": "Shakerag Elementary", "batch": "Shakerag program", "source": "Shakerag", "status": "active"}, {"id": "MCA-133", "ts": "2024-08-01", "email": "juliaskim0902@gmail.com", "first": "Zion", "last": "Kim", "age": "", "p1_name": "", "p1_phone": "(678) 898-3533", "p2_name": "", "p2_phone": "", "experience": "", "comments": "Shakerag Elementary", "batch": "Shakerag program", "source": "Shakerag", "status": "active"}, {"id": "MCA-134", "ts": "", "email": "", "first": "Abby", "last": "Lee", "age": "", "p1_name": "", "p1_phone": "(203) 219-8167", "p2_name": "", "p2_phone": "", "experience": "", "comments": "Shakerag Elementary", "batch": "Shakerag program", "source": "Shakerag", "status": "active"}, {"id": "MCA-135", "ts": "2024-08-01", "email": "jaanu84@gmail.com", "first": "Anu", "last": "Desai", "age": "", "p1_name": "", "p1_phone": "(404) 790-1348", "p2_name": "", "p2_phone": "", "experience": "", "comments": "Shakerag Elementary", "batch": "Shakerag program", "source": "Shakerag", "status": "active"}, {"id": "MCA-136", "ts": "2024-08-01", "email": "hli7104@gmail.com", "first": "Heather", "last": "Jackson", "age": "", "p1_name": "", "p1_phone": "(850) 319-0601", "p2_name": "", "p2_phone": "", "experience": "", "comments": "Shakerag Elementary", "batch": "Shakerag program", "source": "Shakerag", "status": "active"}, {"id": "MCA-137", "ts": "2024-08-01", "email": "sheetaljb79@gmail.com", "first": "Maanvi", "last": "Bhat", "age": "", "p1_name": "", "p1_phone": "(919) 907-9586", "p2_name": "", "p2_phone": "", "experience": "", "comments": "Shakerag Elementary", "batch": "Shakerag program", "source": "Shakerag", "status": "active"}, {"id": "MCA-138", "ts": "2024-08-01", "email": "nshradha.panda@gmail.com", "first": "Meisha", "last": "Khare", "age": "", "p1_name": "", "p1_phone": "(404) 713-3372", "p2_name": "", "p2_phone": "", "experience": "", "comments": "Shakerag Elementary", "batch": "Shakerag program", "source": "Shakerag", "status": "active"}, {"id": "MCA-139", "ts": "2024-08-01", "email": "jyothi0805@gmail.com", "first": "Jyothi", "last": "", "age": "", "p1_name": "", "p1_phone": "(408) 338-5072", "p2_name": "", "p2_phone": "", "experience": "", "comments": "Shakerag Elementary", "batch": "Shakerag program", "source": "Shakerag", "status": "active"}, {"id": "MCA-140", "ts": "2024-08-01", "email": "marbelevy@gmail.com", "first": "Marbella", "last": "Levy", "age": "", "p1_name": "", "p1_phone": "(678) 644-0914", "p2_name": "", "p2_phone": "", "experience": "", "comments": "Shakerag Elementary", "batch": "Shakerag program", "source": "Shakerag", "status": "active"}, {"id": "MCA-141", "ts": "2024-08-01", "email": "namsataithebu1@gmail.com", "first": "Namsati", "last": "Thaker", "age": "", "p1_name": "", "p1_phone": "(406) 899-9866", "p2_name": "", "p2_phone": "", "experience": "", "comments": "Shakerag Elementary", "batch": "Shakerag program", "source": "Shakerag", "status": "active"}, {"id": "MCA-142", "ts": "2024-08-01", "email": "meghana.bakare@gmail.com", "first": "Meghana", "last": "Bakare", "age": "", "p1_name": "", "p1_phone": "(812) 581-6000", "p2_name": "", "p2_phone": "", "experience": "", "comments": "Shakerag Elementary", "batch": "Shakerag program", "source": "Shakerag", "status": "active"}, {"id": "MCA-143", "ts": "2024-08-01", "email": "tharp.phd@gmail.com", "first": "Diare", "last": "Thaep", "age": "", "p1_name": "", "p1_phone": "(678) 900-5398", "p2_name": "", "p2_phone": "", "experience": "", "comments": "Shakerag Elementary", "batch": "Shakerag program", "source": "Shakerag", "status": "active"}, {"id": "MCA-144", "ts": "2024-08-01", "email": "mrchadalawada@gmail.com", "first": "Raaga", "last": "Chadalawala", "age": "", "p1_name": "", "p1_phone": "(469) 992-1711", "p2_name": "", "p2_phone": "", "experience": "", "comments": "Shakerag Elementary", "batch": "Shakerag program", "source": "Shakerag", "status": "active"}, {"id": "MCA-145", "ts": "2024-08-01", "email": "gulnawarrjiv@gmail.com", "first": "Rajni", "last": "Gulnawa", "age": "", "p1_name": "", "p1_phone": "(408) 431-0272", "p2_name": "", "p2_phone": "", "experience": "", "comments": "Shakerag Elementary", "batch": "Shakerag program", "source": "Shakerag", "status": "active"}, {"id": "MCA-146", "ts": "2024-08-01", "email": "sarasjiwani@gmail.com", "first": "Sara", "last": "Jiwani", "age": "", "p1_name": "", "p1_phone": "(470) 599-2117", "p2_name": "", "p2_phone": "", "experience": "", "comments": "Shakerag Elementary", "batch": "Shakerag program", "source": "Shakerag", "status": "active"}, {"id": "MCA-147", "ts": "2024-08-01", "email": "jennferltibbit@gmail.com", "first": "Jennifer", "last": "Tibbit", "age": "", "p1_name": "", "p1_phone": "(678) 524-8865", "p2_name": "", "p2_phone": "", "experience": "", "comments": "Shakerag Elementary", "batch": "Shakerag program", "source": "Shakerag", "status": "active"}, {"id": "MCA-148", "ts": "2024-08-01", "email": "niravamin81@gmail.com", "first": "Nirav", "last": "Amin", "age": "", "p1_name": "", "p1_phone": "(770) 871-1170", "p2_name": "", "p2_phone": "", "experience": "", "comments": "Shakerag Elementary", "batch": "Shakerag program", "source": "Shakerag", "status": "active"}, {"id": "MCA-149", "ts": "2024-08-01", "email": "chaturvedi.tina@gmail.com", "first": "Navya", "last": "", "age": "", "p1_name": "", "p1_phone": "(717) 353-1704", "p2_name": "", "p2_phone": "", "experience": "", "comments": "Shakerag Elementary", "batch": "Shakerag program", "source": "Shakerag", "status": "active"}, {"id": "MCA-150", "ts": "2024-08-01", "email": "huixie0308@gmail.com", "first": "Hui", "last": "Xie", "age": "", "p1_name": "", "p1_phone": "(509) 336-9372", "p2_name": "", "p2_phone": "", "experience": "", "comments": "Shakerag Elementary", "batch": "Shakerag program", "source": "Shakerag", "status": "active"}, {"id": "MCA-151", "ts": "2024-08-01", "email": "jaysherryl@hotmail.com", "first": "Sherryl", "last": "Joshi", "age": "", "p1_name": "", "p1_phone": "(770) 547-4645", "p2_name": "", "p2_phone": "", "experience": "", "comments": "Shakerag Elementary", "batch": "Shakerag program", "source": "Shakerag", "status": "active"}, {"id": "MCA-152", "ts": "2024-08-01", "email": "bakulbob@yahoo.com", "first": "Bakul", "last": "Ghayhl", "age": "", "p1_name": "", "p1_phone": "(404) 538-4921", "p2_name": "", "p2_phone": "", "experience": "", "comments": "Shakerag Elementary", "batch": "Shakerag program", "source": "Shakerag", "status": "active"}, {"id": "MCA-153", "ts": "2024-08-01", "email": "chaudharyamit21@gmail.com", "first": "Amit", "last": "Chaudhas", "age": "", "p1_name": "", "p1_phone": "(470) 736-2073", "p2_name": "", "p2_phone": "", "experience": "", "comments": "Shakerag Elementary", "batch": "Shakerag program", "source": "Shakerag", "status": "active"}, {"id": "MCA-154", "ts": "2024-08-01", "email": "ranaus.now@gmail.com", "first": "Samina", "last": "Rana", "age": "", "p1_name": "", "p1_phone": "(470) 380-2729", "p2_name": "", "p2_phone": "", "experience": "", "comments": "Shakerag Elementary", "batch": "Shakerag program", "source": "Shakerag", "status": "active"}, {"id": "MCA-155", "ts": "2024-08-01", "email": "prakash1905@gmail.com", "first": "Prakash", "last": "", "age": "", "p1_name": "", "p1_phone": "(414) 514-4352", "p2_name": "", "p2_phone": "", "experience": "", "comments": "Shakerag Elementary", "batch": "Shakerag program", "source": "Shakerag", "status": "active"}, {"id": "MCA-156", "ts": "2024-08-01", "email": "sam_gilani@hotmail.com", "first": "Shamz", "last": "Gilani", "age": "", "p1_name": "", "p1_phone": "(818) 808-9458", "p2_name": "", "p2_phone": "", "experience": "", "comments": "Shakerag Elementary", "batch": "Shakerag program", "source": "Shakerag", "status": "active"}, {"id": "MCA-157", "ts": "2024-08-01", "email": "sowmyaonline@gmail.com", "first": "Sowmya", "last": "J.", "age": "", "p1_name": "", "p1_phone": "(832) 387-0850", "p2_name": "", "p2_phone": "", "experience": "", "comments": "Shakerag Elementary", "batch": "Shakerag program", "source": "Shakerag", "status": "active"}, {"id": "MCA-158", "ts": "2024-08-01", "email": "july.mircheua@gmail.com", "first": "Nicholas", "last": "V.", "age": "", "p1_name": "", "p1_phone": "(770) 374-3761", "p2_name": "", "p2_phone": "", "experience": "", "comments": "Shakerag Elementary", "batch": "Shakerag program", "source": "Shakerag", "status": "active"}, {"id": "MCA-159", "ts": "2024-08-01", "email": "patelarchit82@gmail.com", "first": "Archit", "last": "Patel", "age": "", "p1_name": "", "p1_phone": "(404) 457-7789", "p2_name": "", "p2_phone": "", "experience": "", "comments": "Shakerag Elementary", "batch": "Shakerag program", "source": "Shakerag", "status": "active"}, {"id": "MCA-160", "ts": "2024-08-01", "email": "vachan_e@yahoo.com", "first": "Aaryan", "last": "Vachan", "age": "", "p1_name": "", "p1_phone": "(678) 499-3452", "p2_name": "", "p2_phone": "", "experience": "", "comments": "Shakerag Elementary", "batch": "Shakerag program", "source": "Shakerag", "status": "active"}, {"id": "MCA-161", "ts": "2024-08-01", "email": "leec7@fultonschools.org", "first": "Calleh", "last": "caden lee", "age": "", "p1_name": "", "p1_phone": "(678) 983-8844", "p2_name": "", "p2_phone": "", "experience": "", "comments": "Shakerag Elementary", "batch": "Shakerag program", "source": "Shakerag", "status": "active"}, {"id": "MCA-162", "ts": "2024-08-01", "email": "kedeng9@gmail.com", "first": "Ian", "last": "Xie", "age": "", "p1_name": "", "p1_phone": "(312) 286-1508", "p2_name": "", "p2_phone": "", "experience": "", "comments": "Shakerag Elementary", "batch": "Shakerag program", "source": "Shakerag", "status": "active"}, {"id": "MCA-163", "ts": "2024-08-01", "email": "kedeng9@gmail.com", "first": "Ella", "last": "Xie", "age": "", "p1_name": "", "p1_phone": "(312) 286-1508", "p2_name": "", "p2_phone": "", "experience": "", "comments": "Shakerag Elementary", "batch": "Shakerag program", "source": "Shakerag", "status": "active"}, {"id": "MCA-164", "ts": "2024-08-01", "email": "wendywang617@yahoo.com", "first": "Xinyu", "last": "Sorg", "age": "", "p1_name": "", "p1_phone": "(347) 822-5708", "p2_name": "", "p2_phone": "", "experience": "", "comments": "Shakerag Elementary", "batch": "Shakerag program", "source": "Shakerag", "status": "active"}, {"id": "MCA-165", "ts": "2024-08-01", "email": "shah.tisha@outlook.com", "first": "Tisha", "last": "Shah", "age": "", "p1_name": "", "p1_phone": "(470) 455-1100", "p2_name": "", "p2_phone": "", "experience": "", "comments": "Shakerag Elementary", "batch": "Shakerag program", "source": "Shakerag", "status": "active"}, {"id": "MCA-166", "ts": "2024-08-01", "email": "sandeepchdy@gmail.com", "first": "Ridhwan", "last": "Choudhary", "age": "", "p1_name": "", "p1_phone": "(678) 767-2186", "p2_name": "", "p2_phone": "", "experience": "", "comments": "Shakerag Elementary", "batch": "Shakerag program", "source": "Shakerag", "status": "active"}, {"id": "MCA-167", "ts": "2024-08-01", "email": "megha.solanki07@gmail.com", "first": "Arjun", "last": "Solanki", "age": "", "p1_name": "", "p1_phone": "(470) 885-6460", "p2_name": "", "p2_phone": "", "experience": "", "comments": "Shakerag Elementary", "batch": "Shakerag program", "source": "Shakerag", "status": "active"}, {"id": "MCA-168", "ts": "2024-08-01", "email": "drswetha83@gmail.com", "first": "Anvith", "last": "Mamilk", "age": "", "p1_name": "", "p1_phone": "", "p2_name": "", "p2_phone": "", "experience": "", "comments": "Shakerag Elementary", "batch": "Shakerag program", "source": "Shakerag", "status": "active"}, {"id": "MCA-169", "ts": "2024-08-01", "email": "vashist.urvashi@gmail.com", "first": "Shrianga", "last": "", "age": "", "p1_name": "", "p1_phone": "(678) 707-3336", "p2_name": "", "p2_phone": "", "experience": "", "comments": "Shakerag Elementary", "batch": "Shakerag program", "source": "Shakerag", "status": "active"}, {"id": "MCA-170", "ts": "2024-08-01", "email": "tlsireesha@gmail.com", "first": "Lakshmi", "last": "", "age": "", "p1_name": "", "p1_phone": "(678) 646-4245", "p2_name": "", "p2_phone": "", "experience": "", "comments": "Shakerag Elementary", "batch": "Shakerag program", "source": "Shakerag", "status": "active"}, {"id": "MCA-171", "ts": "2024-08-01", "email": "gloriayesica71@gmail.com", "first": "Helena", "last": "", "age": "", "p1_name": "", "p1_phone": "(678) 313-2172", "p2_name": "", "p2_phone": "", "experience": "", "comments": "Shakerag Elementary", "batch": "Shakerag program", "source": "Shakerag", "status": "active"}, {"id": "MCA-172", "ts": "", "email": "Miranda.Deng@hotmail.com", "first": "Aiden", "last": "Xu", "age": "6", "p1_name": "Miranda Deng", "p1_phone": "(407) 247-7605", "p2_name": "Peter Xu", "p2_phone": "(407) 242-8319", "experience": "", "comments": "Payment: $75", "batch": "Sharon Springs Montessori", "source": "SS Montessori", "status": "active", "payment": "75"}, {"id": "MCA-173", "ts": "", "email": "icyjeannelij@hotmail.com", "first": "Ella", "last": "Selleck", "age": "6", "p1_name": "Jing Li-Selleck", "p1_phone": "(626) 818-6135", "p2_name": "Jordan Selleck", "p2_phone": "(646) 825-0440", "experience": "", "comments": "Payment: $75", "batch": "Sharon Springs Montessori", "source": "SS Montessori", "status": "active", "payment": "75"}, {"id": "MCA-174", "ts": "", "email": "mahekaisha@yahoo.com", "first": "Aryan", "last": "Kalbhor", "age": "9", "p1_name": "Vidya Ghag", "p1_phone": "(678) 462-3643", "p2_name": "Mahesh Kalbhor", "p2_phone": "(678) 462-1723", "experience": "", "comments": "", "batch": "Sharon Springs Montessori", "source": "SS Montessori", "status": "active", "payment": "0"}, {"id": "MCA-175", "ts": "", "email": "dhrtbahl@gmail.com", "first": "Ada", "last": "Duggal", "age": "9", "p1_name": "Dhriti Bahl Duggal", "p1_phone": "(636) 787-7665", "p2_name": "Anand Duggal", "p2_phone": "(512) 542-9928", "experience": "", "comments": "Payment: $75", "batch": "Sharon Springs Montessori", "source": "SS Montessori", "status": "active", "payment": "75"}, {"id": "MCA-176", "ts": "", "email": "minshencao@yahoo.com", "first": "Raymond", "last": "Cao", "age": "8", "p1_name": "Minshen Cao", "p1_phone": "(404) 384-9545", "p2_name": "Peiling Chen", "p2_phone": "(702) 680-9379", "experience": "", "comments": "Payment: $75", "batch": "Sharon Springs Montessori", "source": "SS Montessori", "status": "active", "payment": "75"}, {"id": "MCA-177", "ts": "", "email": "srikanth.surikutchi@gmail.com", "first": "Vihaan", "last": "Surikutchi", "age": "5", "p1_name": "Srikanth Surikutchi", "p1_phone": "(862) 754-7084", "p2_name": "Sai Ramani Kompella", "p2_phone": "(862) 414-1632", "experience": "", "comments": "Payment: $75", "batch": "Sharon Springs Montessori", "source": "SS Montessori", "status": "active", "payment": "75"}, {"id": "MCA-178", "ts": "", "email": "GregoryFamily0419@gmail.com", "first": "William", "last": "Gregory", "age": "10", "p1_name": "Erica Gregory", "p1_phone": "(770) 722-3450", "p2_name": "Blake Gregory", "p2_phone": "(770) 722-3450", "experience": "", "comments": "", "batch": "Sharon Springs Montessori", "source": "SS Montessori", "status": "active", "payment": "0"}, {"id": "MCA-179", "ts": "", "email": "lisn09@gmail.com", "first": "Jameson", "last": "Hall", "age": "", "p1_name": "Mellissa Hall", "p1_phone": "", "p2_name": "", "p2_phone": "", "experience": "", "comments": "", "batch": "Sharon Springs Montessori", "source": "SS Montessori", "status": "active", "payment": "0"}, {"id": "MCA-180", "ts": "", "email": "jital_04@yahoo.com", "first": "Aadhya", "last": "Pancholi", "age": "", "p1_name": "Jital Panchouli", "p1_phone": "", "p2_name": "", "p2_phone": "", "experience": "", "comments": "", "batch": "Sharon Springs Montessori", "source": "SS Montessori", "status": "active", "payment": "0"}, {"id": "MCA-181", "ts": "", "email": "pphazrah@yahoo.co.in", "first": "Ojal", "last": "", "age": "5", "p1_name": "Preetpal", "p1_phone": "(470) 295-5559", "p2_name": "", "p2_phone": "", "experience": "", "comments": "", "batch": "Sharon Springs Montessori", "source": "SS Montessori", "status": "active", "payment": "0"}, {"id": "MCA-182", "ts": "", "email": "lisn09@gmail.com", "first": "Elanna", "last": "Hall", "age": "", "p1_name": "Mellissa Hall", "p1_phone": "", "p2_name": "", "p2_phone": "", "experience": "", "comments": "", "batch": "Sharon Springs Montessori", "source": "SS Montessori", "status": "active", "payment": "0"}, {"id": "MCA-183", "ts": "", "email": "gvidhu@gmail.com", "first": "Sathvika Varsha", "last": "Ganesan", "age": "7", "p1_name": "Vijji Vidhu", "p1_phone": "(404) 376-7716", "p2_name": "Vidhu Ganesan", "p2_phone": "(630) 886-7491", "experience": "", "comments": "", "batch": "Sharon Springs Montessori", "source": "SS Montessori", "status": "active", "payment": "0"}];
+const PAST = ["Om", "Rajdeep", "Sophia", "Kiaan", "Sohil", "Aalya", "Medha", "Akshat", "Leela", "Pratyusha", "Prayaan", "Aashil", "Bhaavik", "Aryan", "Leo", "Sarvansh", "Rikin", "Rayan", "Likitha", "Karthik", "Shinjini", "Harshit", "Siddharth", "Aritro", "Shlok", "deetya", "Deepthi", "Zain", "Pranav", "Abhishek", "Sai Ratan", "Ranvijay", "Viyaan", "Vaibhav sankar", "Jerrick", "Akshaj", "Satvik", "Rajaselvam", "Nidhi", "Thejasvee", "Prasanna", "Aiden", "Ella", "Aryan", "Ada", "Raymond", "Milan", "Aarush and Vedant", "Dharsan", "William", "Medha", "Ishan", "Sri", "Sathvika Varsha", "Reyansh", "Pavit", "Rihaan", "Praneeth", "Praneeth", "Riana", "Abdur-Rahman", "Aahana", "Hareesh", "Harini", "Vaahin", "Avani", "Akshara", "Riyanshi", "Aarjav", "Mihit", "Reyaan", "Bivab", "Shourjo", "Aayra", "Riaan", "Samuel (Sam)"];
+
+// Tab switching
+document.querySelectorAll('.tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+  });
+});
+
+// Avatar color by initials
+function avatarColor(initials) {
+  const colors = [
+    {bg:'#FAEEDA',fg:'#633806'},{bg:'#E1F5EE',fg:'#085041'},
+    {bg:'#EEEDFE',fg:'#3C3489'},{bg:'#FAECE7',fg:'#712B13'},
+    {bg:'#1A1A1A',fg:'#E8751A'}
+  ];
+  let h = 0;
+  for (let c of initials) h = (h * 31 + c.charCodeAt(0)) % colors.length;
+  return colors[h];
+}
+
+function getInitials(s) {
+  const f = (s.first || '?').trim()[0] || '?';
+  const l = (s.last || '').trim()[0] || '';
+  return (f + l).toUpperCase();
+}
+
+function ageBucket(a) {
+  if (!a) return '';
+  const n = parseFloat(a);
+  if (isNaN(n)) return '';
+  if (n <= 6) return '4-6';
+  if (n <= 9) return '7-9';
+  if (n <= 12) return '10-12';
+  return '13+';
+}
+
+function expLabel(e) {
+  if (!e) return 'Unknown';
+  if (e.includes('Yes')) return 'Yes';
+  if (e.includes('No')) return 'No';
+  return 'Unknown';
+}
+
+function badgeClass(source) {
+  if (source === 'Master 2025') return 'badge-master';
+  if (source === 'Shakerag') return 'badge-shakerag';
+  return 'badge-ss';
+}
+
+function sourceLabel(source) {
+  if (source === 'Master 2025') return 'Mohar Chess';
+  if (source === 'Shakerag') return 'Shakerag';
+  return 'SS Montessori';
+}
+
+const PER_PAGE = 25;
+let currentPage = 1;
+
+function getFilteredStudents() {
+  const q = (document.getElementById('search').value || '').toLowerCase().trim();
+  const fSrc = document.getElementById('filter-source').value;
+  const fAge = document.getElementById('filter-age').value;
+  const fExp = document.getElementById('filter-exp').value;
+
+  return STUDENTS.filter(s => {
+    if (fSrc && s.source !== fSrc) return false;
+    if (fAge && ageBucket(s.age) !== fAge) return false;
+    if (fExp && expLabel(s.experience) !== fExp) return false;
+    if (q) {
+      const hay = [s.first,s.last,s.email,s.p1_name,s.p2_name,s.p1_phone,s.p2_phone,s.id].join(' ').toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+}
+
+function renderStudents() {
+  const filtered = getFilteredStudents();
+  const total = filtered.length;
+  document.getElementById('student-count').textContent = total + ' of ' + STUDENTS.length + ' students';
+  const totalPages = Math.max(1, Math.ceil(total / PER_PAGE));
+  if (currentPage > totalPages) currentPage = 1;
+  const start = (currentPage - 1) * PER_PAGE;
+  const slice = filtered.slice(start, start + PER_PAGE);
+
+  const tbody = document.getElementById('student-tbody');
+  if (slice.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="8"><div class="empty-msg">No students match your filters.</div></td></tr>';
+  } else {
+    tbody.innerHTML = slice.map(s => {
+      const ini = getInitials(s);
+      const ac = avatarColor(ini);
+      const exp = expLabel(s.experience);
+      const expB = exp === 'Yes' ? 'badge-yes' : exp === 'No' ? 'badge-no' : 'badge-unknown';
+      const expT = exp === 'Yes' ? 'Played before' : exp === 'No' ? 'New' : '\u2014';
+      const fullName = (s.first + ' ' + s.last).trim();
+      return `<tr style="cursor:pointer;" onclick='showStudent("${s.id}")'>
+        <td><div class="avatar" style="background:${ac.bg}; color:${ac.fg};">${ini}</div></td>
+        <td><div style="font-weight:500;">${escapeHtml(fullName)}</div><div class="contact-line">${s.id}</div></td>
+        <td>${s.age || '\u2014'}</td>
+        <td>${escapeHtml(s.p1_name) || '\u2014'}${s.p2_name ? '<br><span class="contact-line">' + escapeHtml(s.p2_name) + '</span>' : ''}</td>
+        <td style="font-size:11.5px;">${escapeHtml(s.p1_phone) || '\u2014'}</td>
+        <td style="font-size:11.5px;">${escapeHtml(s.email) || '\u2014'}</td>
+        <td><span class="badge ${badgeClass(s.source)}">${sourceLabel(s.source)}</span></td>
+        <td><span class="badge ${expB}">${expT}</span></td>
+      </tr>`;
+    }).join('');
+  }
+
+  // Pagination
+  const pagEl = document.getElementById('pagination');
+  if (totalPages <= 1) { pagEl.innerHTML = ''; return; }
+  let html = '';
+  html += `<button class="page-btn" ${currentPage===1?'disabled style="opacity:.4;"':''} onclick="gotoPage(${currentPage-1})">&lsaquo; Prev</button>`;
+  const win = 5;
+  let s = Math.max(1, currentPage - 2);
+  let e = Math.min(totalPages, s + win - 1);
+  s = Math.max(1, e - win + 1);
+  if (s > 1) html += `<button class="page-btn" onclick="gotoPage(1)">1</button>` + (s > 2 ? '<span style="color:var(--muted);">...</span>' : '');
+  for (let i=s; i<=e; i++) html += `<button class="page-btn ${i===currentPage?'active':''}" onclick="gotoPage(${i})">${i}</button>`;
+  if (e < totalPages) html += (e < totalPages-1 ? '<span style="color:var(--muted);">...</span>' : '') + `<button class="page-btn" onclick="gotoPage(${totalPages})">${totalPages}</button>`;
+  html += `<button class="page-btn" ${currentPage===totalPages?'disabled style="opacity:.4;"':''} onclick="gotoPage(${currentPage+1})">Next &rsaquo;</button>`;
+  pagEl.innerHTML = html;
+}
+
+function gotoPage(p) {
+  currentPage = p;
+  renderStudents();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function escapeHtml(s) {
+  if (!s) return '';
+  return String(s).replace(/[&<>"\']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function showStudent(id) {
+  const s = STUDENTS.find(x => x.id === id);
+  if (!s) return;
+  const exp = expLabel(s.experience);
+  const fullName = (s.first + ' ' + s.last).trim();
+  const ini = getInitials(s);
+  const ac = avatarColor(ini);
+  document.getElementById('modal-body').innerHTML = `
+    <div style="display:flex; gap:14px; align-items:center; margin-bottom:18px;">
+      <div class="avatar" style="width:54px; height:54px; font-size:18px; background:${ac.bg}; color:${ac.fg};">${ini}</div>
+      <div>
+        <h3>${escapeHtml(fullName)}</h3>
+        <div style="font-size:12px; color:var(--muted);">${s.id} &middot; <span class="badge ${badgeClass(s.source)}">${sourceLabel(s.source)}</span></div>
+      </div>
+    </div>
+    <div class="detail-grid">
+      <div class="detail-key">Age</div><div class="detail-val">${s.age || '\u2014'}</div>
+      <div class="detail-key">Email</div><div class="detail-val">${escapeHtml(s.email) || '\u2014'}</div>
+      <div class="detail-key">Parent 1</div><div class="detail-val">${escapeHtml(s.p1_name) || '\u2014'}${s.p1_phone ? ' &middot; ' + escapeHtml(s.p1_phone) : ''}</div>
+      <div class="detail-key">Parent 2</div><div class="detail-val">${escapeHtml(s.p2_name) || '\u2014'}${s.p2_phone ? ' &middot; ' + escapeHtml(s.p2_phone) : ''}</div>
+      <div class="detail-key">Experience</div><div class="detail-val">${exp === 'Yes' ? 'Played before' : exp === 'No' ? 'New to chess' : 'Not specified'}</div>
+      <div class="detail-key">Comments</div><div class="detail-val">${escapeHtml(s.comments) || '\u2014'}</div>
+      <div class="detail-key">Registered</div><div class="detail-val">${escapeHtml(s.ts) || '\u2014'}</div>
+      ${s.batch ? `<div class="detail-key">Batch</div><div class="detail-val">${escapeHtml(s.batch)}</div>` : ''}
+      ${s.payment ? `<div class="detail-key">Payment</div><div class="detail-val">$${escapeHtml(s.payment)}</div>` : ''}
+    </div>`;
+  document.getElementById('modal-bg').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('modal-bg').classList.remove('show');
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// SS school table
+function renderSS() {
+  const ss = STUDENTS.filter(s => s.source === 'SS Montessori');
+  document.getElementById('ss-tbody').innerHTML = ss.map(s => `
+    <tr>
+      <td>${escapeHtml((s.first + ' ' + s.last).trim())}</td>
+      <td>${s.age || '\u2014'}</td>
+      <td>${escapeHtml(s.p1_name) || '\u2014'}</td>
+      <td>${escapeHtml(s.p1_phone) || '\u2014'}</td>
+      <td>${s.payment && parseFloat(s.payment) > 0 ? '<span class="badge badge-yes">$' + s.payment + '</span>' : '<span class="badge badge-no">Unpaid</span>'}</td>
+    </tr>`).join('');
+}
+
+// Alumni grid
+function renderAlumni() {
+  document.getElementById('alumni-grid').innerHTML = PAST.map(name => `
+    <div style="background:var(--panel-2); border-radius:6px; padding:8px 12px; font-size:12.5px; color:var(--ink-2);">${escapeHtml(name)}</div>`).join('');
+}
+
+// Initial render
+renderStudents();
+renderSS();
+renderAlumni();
+</script>
+</body>
+</html>

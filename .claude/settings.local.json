@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(anthropic-skills:xlsx)",
+      "Skill(anthropic-skills:xlsx:*)",
+      "Bash(python -c ' *)",
+      "Bash(python)",
+      "Bash(npm --version)",
+      "Bash(npm init *)",
+      "Bash(npm install *)",
+      "Bash(npm create *)",
+      "Bash(npm run *)",
+      "Bash(npm start *)",
+      "Bash(Start-Sleep -Seconds 3)",
+      "Bash(\"Frontend is *)",
+      "PowerShell(git *)"
+    ]
+  }
+}
