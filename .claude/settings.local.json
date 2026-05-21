@@ -13,7 +13,9 @@
       "Bash(npm start *)",
       "Bash(Start-Sleep -Seconds 3)",
       "Bash(\"Frontend is *)",
-      "PowerShell(git *)"
+      "PowerShell(git *)",
+      "WebFetch(domain:mohar-chess-crm.vercel.app)",
+      "WebFetch(domain:moharchesscrm.onrender.com)"
     ]
   }
 }

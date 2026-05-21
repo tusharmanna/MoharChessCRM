@@ -1,4 +1,0 @@
-{
-  "buildCommand": "npm --prefix crm-app/frontend install && npm --prefix crm-app/frontend run build",
-  "outputDirectory": "crm-app/frontend/dist"
-}
