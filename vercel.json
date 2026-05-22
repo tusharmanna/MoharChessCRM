@@ -1,8 +1,4 @@
 {
   "buildCommand": "cd crm-app/frontend && npm run build",
-  "outputDirectory": "crm-app/frontend/dist",
-  "rootDirectory": "crm-app/frontend",
-  "env": {
-    "VITE_API_URL": "@vite_api_url"
-  }
+  "outputDirectory": "crm-app/frontend/dist"
 }

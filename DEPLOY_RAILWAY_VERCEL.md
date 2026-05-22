@@ -109,36 +109,38 @@ In Vercel import dialog:
 
 **2. Root Directory:**
 - Select **`crm-app/frontend`** from dropdown
-- This tells Vercel where the frontend code is
+- This tells Vercel where the frontend code is located
 
 **3. Build Command:**
-- Auto-detected: `npm run build` ✅
-- If different, change to: `npm run build`
+- Auto-detected: `npm run build` (or will show the command from package.json)
+- Vercel will use the correct build command automatically
+- You can leave as default
 
 **4. Output Directory:**
 - Auto-detected: `dist` ✅
-- Keep as is
+- Keep as is (Vercel detects this from `vercel.json`)
 
 **5. Environment Variables:**
-- You'll add these in the next step
-- Click **Add Environment Variable**
+- You'll add these in the next step (after creating the project)
+- Do NOT set them during import—set after project creation
 
 ### Step 4: Add Environment Variables
 
-Before deployment, add the backend API URL:
+After project is created (or during import), add the backend API URL:
 
-**In Vercel environment variables:**
-
-```
-Variable Name: VITE_API_URL
-Value: https://moharcrm-backend.up.railway.app/api
-```
+**In Vercel Dashboard:**
+1. Go to your project settings
+2. Click **Environment Variables**
+3. Add new variable:
+   - Name: `VITE_API_URL`
+   - Value: `https://moharcrm-backend.up.railway.app/api`
+   - Environments: Select **Production**, **Preview**, and **Development**
 
 (Replace with your actual Railway backend URL from Part 1, Step 4)
 
-**For different environments** (optional):
-- Production (main branch): `https://moharcrm-backend.up.railway.app/api`
-- Preview (PR branches): Can be different or same
+**Environment Variable Settings:**
+- Apply to all environments (Production, Preview, Development)
+- This ensures API URL works in all deployment stages
 
 ### Step 5: Deploy Frontend
 
