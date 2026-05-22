@@ -2,7 +2,11 @@ const initSqlJs = require('sql.js');
 const fs = require('fs');
 const path = require('path');
 
-const dbPath = path.join(__dirname, 'crm.db');
+// Use persistent disk location in production (Render), local in development
+const dbPath = process.env.DATABASE_PATH || path.join(__dirname, 'crm.db');
+console.log(`Database path: ${dbPath}`);
+console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
+
 let db;
 
 async function initDatabase() {
@@ -10,13 +14,18 @@ async function initDatabase() {
 
   try {
     if (fs.existsSync(dbPath)) {
+      const stats = fs.statSync(dbPath);
+      console.log(`Loading existing database: ${dbPath} (${stats.size} bytes)`);
       const filebuffer = fs.readFileSync(dbPath);
       db = new SQL.Database(filebuffer);
+      console.log('Database loaded successfully');
     } else {
+      console.log(`Creating new database at: ${dbPath}`);
       db = new SQL.Database();
     }
   } catch (err) {
     console.error('DB load error:', err);
+    console.error('Stack:', err.stack);
     db = new SQL.Database();
   }
 
@@ -143,9 +152,12 @@ function query(sql, params = []) {
       results.push(stmt.getAsObject());
     }
     stmt.free();
+    if (results.length === 0 && sql.includes('SELECT')) {
+      console.log(`Query returned 0 results: ${sql.substring(0, 100)}`);
+    }
     return results;
   } catch (err) {
-    console.error('Query error:', err, sql);
+    console.error('Query error:', err, 'SQL:', sql.substring(0, 200));
     return [];
   }
 }

@@ -16,7 +16,11 @@
       "PowerShell(git *)",
       "WebFetch(domain:mohar-chess-crm.vercel.app)",
       "WebFetch(domain:moharchesscrm.onrender.com)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(Get-ChildItem -Path \"E:\\\\work\\\\MoharCRM\" -Exclude node_modules)",
+      "Bash(Select-Object Name)"
     ]
   }
 }

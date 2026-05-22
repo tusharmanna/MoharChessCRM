@@ -1,0 +1,8 @@
+{
+  "rootDirectory": "crm-app/backend",
+  "buildCommand": "npm install",
+  "startCommand": "npm start",
+  "env": {
+    "NODE_ENV": "production"
+  }
+}

@@ -31,6 +31,13 @@ npm run dev
 ```
 Runs on **http://localhost:5173** (Vite dev server)
 
+**Environment configuration:**
+Copy `.env.example` to `.env.local` (optional—defaults to `http://localhost:5000/api`):
+```
+VITE_API_URL=http://localhost:5000/api
+```
+The Vite dev server also proxies `/api` requests to the backend via `vite.config.js`.
+
 Available npm scripts:
 - `npm run dev` - Start Vite development server
 - `npm run build` - Create optimized production build
@@ -47,9 +54,10 @@ Available npm scripts:
   - Body-parser for JSON parsing
   - RESTful endpoints for students, communications, tasks, metadata
   
-- `db.js` - SQLite database initialization and schema (~61 lines)
-  - Creates 4 tables on startup: students, parents, communications, tasks
-  - Handles database connection and table creation
+- `db.js` - sql.js database initialization and schema (~61 lines)
+  - Uses sql.js (JavaScript SQLite)—loads `crm.db` file into memory on startup
+  - Creates 4 tables: students, parents, communications, tasks
+  - Provides helper functions: `query()`, `queryOne()`, `run()` for database access
   
 - `importData.js` - Excel import script
   - Reads Contact Information.xlsx and populates database
@@ -124,19 +132,27 @@ Available npm scripts:
 ## Development Notes
 
 ### Code Patterns
-- **API Calls**: Backend uses callbacks with sqlite3 (not promises). Multiple nested callbacks are common in server.js.
+- **API Calls**: Backend uses synchronous db functions (not promises/callbacks). sql.js runs entirely in-process and is synchronous.
 - **Frontend State**: React components use useState for local state; API calls via axios from api.js
-- **Database Access**: Use db.get(), db.all(), db.run() with parameterized queries (? placeholders) to prevent SQL injection
+- **Database Access**: Use `query()`, `queryOne()`, `run()` (not db.all/get/run) with parameterized queries (? placeholders) to prevent SQL injection
+- **Error Handling**: Backend wraps endpoints in try-catch; returns JSON with error messages or 500 status
 
 ### Important Implementation Details
-- SQLite uses `AUTOINCREMENT` for IDs but will reuse IDs after delete without it—current schema is safe
+- **sql.js behavior**: Database runs entirely in memory (loaded from `crm.db` file). Changes are persisted back to the file but there's no transaction journal—be careful with concurrent writes.
 - Search queries use LIKE with wildcards on name and email fields
 - Pagination defaults to 50 students per page with limit/offset parameters
 - Foreign keys have ON DELETE CASCADE for data integrity
 - Status field on students defaults to 'prospect'
+- Backend helper functions (`query`, `queryOne`, `run`) are synchronous—sql.js has no async operations
 
 ### Linting
-ESLint is configured for the frontend (eslint.config.js). Run `npm run lint` to check for issues.
+ESLint is configured for the frontend only (eslint.config.js). Run `npm run lint` to check for issues. Backend has no linting configured.
+
+### Database Reset
+To clear the database during development:
+1. Stop the backend server
+2. Delete `crm-app/backend/crm.db`
+3. Restart the backend—it will recreate an empty database with fresh schema
 
 ## Data Import Workflow
 
@@ -150,8 +166,8 @@ ESLint is configured for the frontend (eslint.config.js). Run `npm run lint` to 
 | Layer | Tech |
 |-------|------|
 | **Frontend** | React 19, Vite 8, Axios, react-icons, ESLint |
-| **Backend** | Node.js, Express 5, body-parser, cors |
-| **Database** | SQLite3 |
+| **Backend** | Node.js, Express 5, body-parser, cors, sql.js |
+| **Database** | sql.js (JavaScript SQLite—loads crm.db into memory) |
 | **Build** | Vite (frontend), CommonJS modules (backend) |
 
 ## Common Workflows
@@ -171,6 +187,52 @@ ESLint is configured for the frontend (eslint.config.js). Run `npm run lint` to 
 - Global defaults: index.css
 - Components are styled inline or via App.css classes
 
+## Deployment
+
+**Current Status:** Local development only (http://localhost:5000 and http://localhost:5173)
+
+### Quick Deployment with Render (Recommended)
+
+Render is the simplest option—one platform for backend + frontend, free tier available, auto-deploys from GitHub.
+
+**Steps:**
+1. Create Render account (https://render.com)
+2. Connect GitHub repository
+3. Create Backend Web Service (Node.js)
+4. Add persistent disk for `crm.db` (critical for sql.js)
+5. Create Frontend Static Site
+6. Set environment variables for API URL
+7. Deploy—auto-redeploys on git push
+
+**Important:** Since sql.js loads the database into memory, you MUST:
+- Configure persistent disk in Render
+- Implement regular backups of `crm.db`
+- Test database changes persist across restarts
+
+### Other Deployment Options
+
+- **Railway:** $7-20/month (very similar to Render)
+- **Vercel (Frontend Only):** Free + Railway backend ($7-20/month)
+- **Heroku:** $7/month (less reliable, similar setup)
+- **DigitalOcean:** $4-12/month (more control, harder setup)
+- **AWS:** $10-100+/month (enterprise scale)
+
+### Deployment Guides
+
+**See DEPLOY_RENDER.md for:**
+- Complete step-by-step Render setup
+- Backend Web Service configuration
+- Frontend Static Site configuration
+- Database persistence with Render disks
+- Backup strategies
+- Monitoring and logs
+- Troubleshooting
+- Advanced SPA routing solutions
+
+**Alternative:** DEPLOY_RAILWAY_VERCEL.md for Railway + Vercel setup
+
 ## Future Considerations
 
 From the README, planned features include: user authentication, bulk operations, file uploads, advanced reporting, and mobile integration. Keep architecture flexible for adding middleware and auth layers.
+
+Long-term scaling: Plan to migrate from SQLite to PostgreSQL when database grows beyond in-memory limits.
