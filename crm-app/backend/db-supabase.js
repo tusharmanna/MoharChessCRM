@@ -1,17 +1,12 @@
-require('dotenv').config({ path: '.env.local' });
 const { Client } = require('pg');
 
 let client;
 
 async function initDatabase() {
   try {
-    console.log('DATABASE_URL:', process.env.DATABASE_URL);
-    console.log('NODE_ENV:', process.env.NODE_ENV);
     client = new Client({
       connectionString: process.env.DATABASE_URL,
-      ssl: {
-        rejectUnauthorized: false
-      }
+      ssl: { rejectUnauthorized: false }
     });
 
     await client.connect();

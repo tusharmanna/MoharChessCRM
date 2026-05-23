@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const { initDatabase, query, queryOne, run } = require('./db');
+const { initDatabase, query, queryOne, run } = require('./db-supabase');
 
 const app = express();
 app.use(cors());
