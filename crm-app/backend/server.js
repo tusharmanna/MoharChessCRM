@@ -406,7 +406,7 @@ initDatabase().then(() => {
         enrolled: enrolled?.count || 0,
         hotLeads: hotLeads?.count || 0,
         atRiskStudents: atRisk?.count || 0,
-        conversionRate: avgConversion?.rate || 0
+        conversionRate: parseFloat(avgConversion?.rate) || 0
       });
     } catch (err) {
       res.status(500).json({ error: err.message });
